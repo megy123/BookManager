@@ -1,0 +1,17 @@
+﻿Requirements v.1 :
+-prehľad všetkých kníh v zložke
+-detail knihy a informácie(názov, autor, náhľadový obrázok, popis knihy, poznámky, počet stán, aktuálna strana,(kapitoly))
+-ukladanie a načítavanie informácií zo súboru
+-prehľad prečítaných a rozčítaných kníh, hodnotenie knih teda akási štatistika, obľubené, (plán čítania)
+
+Návrh:
+https://app.moqups.com/
+
+-kompletné GUI pre aplikáciu(Domovský form so stromom kníh náhľadom a nastaveniami, Detail knihy s podrobnými
+informáciami o knihe)
+-Naprogramovanie Triedy čo udržiava dáta o knihe
+-Naprogramovanie Triedy čo udržiava dáta o všetkom(knihy, uživateľské štatistiky)
+-Zabezpečenie ukladanie a načítavania dát(Trieda na ukladanie a načítavanie dát do Triedy ktorá dáta udržiava v aplikácii)
+-prepojenie frontendu s backendom
+-sprehľadnenie kódu
+-finálne úpravy
