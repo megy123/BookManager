@@ -62,9 +62,9 @@ Partial Class BookDetail
         Me.Label1.Location = New System.Drawing.Point(12, 321)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(92, 20)
+        Me.Label1.Size = New System.Drawing.Size(56, 20)
         Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Hodnotenie"
+        Me.Label1.Text = "Rating"
         '
         'Label2
         '

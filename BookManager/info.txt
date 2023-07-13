@@ -15,3 +15,39 @@ informáciami o knihe)
 -prepojenie frontendu s backendom
 -sprehľadnenie kódu
 -finálne úpravy
+
+
+Database query:
+
+CREATE TABLE BM_Users (
+    id INT NOT NULL,
+    startup_sync BIT,
+    confirm_sync BIT,
+    last_sync DATE,
+    last_read DATE,
+    lib_path NVARCHAR(512),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE BM_Books (
+    id INT,
+    title NVARCHAR(256),
+    author NVARCHAR(256),
+    start_date DATE,
+    finish_date DATE,
+    description TEXT,
+    notes TEXT,
+    actual_page INT,
+    total_pages INT,
+    book_path NVARCHAR(512),
+    rating INT,
+    status INT,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE BM_Favts (
+    id INT NOT NULL,
+    book_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (book_id) REFERENCES BM_Books(id)
+);
