@@ -89,6 +89,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Book.vb" />
+    <Compile Include="Classes\Constants.vb" />
+    <Compile Include="Classes\DatabaseManager.vb" />
     <Compile Include="Classes\DataManager.vb" />
     <Compile Include="Classes\User.vb" />
     <Compile Include="Forms\BookDetail.Designer.vb">

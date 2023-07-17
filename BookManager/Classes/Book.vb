@@ -8,23 +8,9 @@
     Dim l_path As String
     Dim l_rating As String
     Dim l_image As Image
-#Region "Constructors"
-    Public Sub New(name As String, autor As String)
-        Me.name = name
-        Me.autor = autor
-    End Sub
 
-    Public Sub New(name As String, autor As String, pages As Short, page As Short, comment As String, description As String, path As String, image As Image, rating As String)
-        Me.name = name
-        Me.autor = autor
-        Me.pages = pages
-        Me.page = page
-        Me.comment = comment
-        Me.description = description
-        Me.path = path
-        Me.image = image
-        Me.rating = rating
-    End Sub
+#Region "Constructors"
+
 #End Region
 
 #Region "Properties"
@@ -116,16 +102,16 @@
         Return page / pages * 100
     End Function
 
-    Public Function getState()
-        Select Case page
-            Case 0
-                Return bookState.none
-            Case pages
-                Return bookState.finished
-            Case Else
-                Return bookState.reading
-        End Select
-    End Function
+    'Public Function getState()
+    '    Select Case page
+    '        Case 0
+    '            Return bookState.none
+    '        Case pages
+    '            Return bookState.finished
+    '        Case Else
+    '            Return bookState.reading
+    '    End Select
+    'End Function
 
 #End Region
 End Class
