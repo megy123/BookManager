@@ -41,9 +41,18 @@ Public Class DatabaseManager
             command.CommandText = "EXECUTE getUserBooks"
             reader = command.ExecuteReader()
             While reader.Read()
-                Dim book As New Book()
-
-                'TODO dopíš content book
+                Dim book As New Book(reader.GetInt32(0),
+                                     reader.GetString(1),
+                                     reader.GetString(2),
+                                     reader.GetDateTime(3),
+                                     reader.GetDateTime(4),
+                                     reader.GetString(6),
+                                     reader.GetString(5),
+                                     reader.GetInt32(7),
+                                     reader.GetInt32(8),
+                                     reader.GetString(9),
+                                     reader.GetInt32(10),
+                                     reader.GetInt32(11))
 
                 books.Add(book)
             End While
@@ -63,9 +72,18 @@ Public Class DatabaseManager
             command.CommandText = "EXECUTE getUserFavs"
             reader = command.ExecuteReader()
             While reader.Read()
-                Dim book As New Book()
-
-                'TODO dopíš content book
+                Dim book As New Book(reader.GetInt32(0),
+                                     reader.GetString(1),
+                                     reader.GetString(2),
+                                     reader.GetDateTime(3),
+                                     reader.GetDateTime(4),
+                                     reader.GetString(6),
+                                     reader.GetString(5),
+                                     reader.GetInt32(7),
+                                     reader.GetInt32(8),
+                                     reader.GetString(9),
+                                     reader.GetInt32(10),
+                                     reader.GetInt32(11))
 
                 favs.Add(book)
             End While

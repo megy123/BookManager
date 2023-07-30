@@ -51,3 +51,5 @@ CREATE TABLE BM_Favts (
     PRIMARY KEY (id),
     FOREIGN KEY (book_id) REFERENCES BM_Books(id)
 );
+
+Synchronizácia
