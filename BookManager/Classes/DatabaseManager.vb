@@ -95,4 +95,21 @@ Public Class DatabaseManager
             MessageBox.Show(ex.Message)
         End Try
     End Function
+
+    Public Function getNewBookId() As UInteger
+        Try
+            Dim command As SqlCommand = connection.CreateCommand()
+            Dim reader As SqlDataReader
+            command.CommandText = "EXECUTE getNewBookId"
+            reader = command.ExecuteReader()
+            Dim id As UInteger = reader.GetInt32(0)
+
+
+            reader.Close()
+            Return id
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Function
+
 End Class
