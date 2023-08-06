@@ -1,4 +1,5 @@
-﻿Public Class Book
+﻿Imports Spire.Pdf
+Public Class Book
     Dim l_id As UInteger
     Dim l_title As String
     Dim l_autor As String
@@ -9,14 +10,13 @@
     Dim l_page As Short
     Dim l_pages As Short
     Dim l_path As String
-    Dim l_rating As String
-    Dim l_status As String
+    Dim l_rating As SByte
+    Dim l_status As SByte
     Dim l_image As Image
 
 
-
 #Region "Constructors"
-    Public Sub New(l_id As UInteger, l_title As String, l_autor As String, l_begin_date As Date, l_finish_date As Date, l_notes As String, l_description As String, l_page As Short, l_pages As Short, l_path As String, l_rating As String, l_status As String)
+    Public Sub New(l_id As UInteger, l_title As String, l_autor As String, l_begin_date As Date, l_finish_date As Date, l_notes As String, l_description As String, l_page As Short, l_pages As Short, l_path As String, l_rating As SByte, l_status As SByte)
         Me.l_id = l_id
         Me.l_title = l_title
         Me.l_autor = l_autor
@@ -45,13 +45,13 @@
         If header(0) = &H25 And header(1) = &HBB And header(7) = &H10 Then
             Me.l_id = BitConverter.ToUInt32(header, 3)
         Else
-            Me.l_id = BitConverter.ToUInt32({&H52, &H18, &H9A, &HAA}, 0) 'db.getNewBookId()
+            Me.l_id = BitConverter.ToUInt32(getNewId(), 0) 'db.getNewBookId()
             assignIdToBook(Me.l_id, path)
         End If
 
         Dim hb As Byte() = BitConverter.GetBytes(Me.l_id)
         MessageBox.Show("ID: " & Me.l_id & " HEX: " & Hex(hb(0)) & " " & Hex(hb(1)) & " " & Hex(hb(2)) & " " & Hex(hb(3)))
-
+        loadBookData(path)
 
     End Sub
 
@@ -59,6 +59,122 @@
 #End Region
 
 #Region "Properties"
+    Public Property id As UInteger
+        Get
+            Return l_id
+        End Get
+        Set(value As UInteger)
+            l_id = value
+        End Set
+    End Property
+
+    Public Property title As String
+        Get
+            Return l_title
+        End Get
+        Set(value As String)
+            l_title = value
+        End Set
+    End Property
+
+    Public Property autor As String
+        Get
+            Return l_autor
+        End Get
+        Set(value As String)
+            l_autor = value
+        End Set
+    End Property
+
+    Public Property begin_date As Date
+        Get
+            Return l_begin_date
+        End Get
+        Set(value As Date)
+            l_begin_date = value
+        End Set
+    End Property
+
+    Public Property finish_date As Date
+        Get
+            Return l_finish_date
+        End Get
+        Set(value As Date)
+            l_finish_date = value
+        End Set
+    End Property
+
+    Public Property notes As String
+        Get
+            Return l_notes
+        End Get
+        Set(value As String)
+            l_notes = value
+        End Set
+    End Property
+
+    Public Property description As String
+        Get
+            Return l_description
+        End Get
+        Set(value As String)
+            l_description = value
+        End Set
+    End Property
+
+    Public Property page As Short
+        Get
+            Return l_page
+        End Get
+        Set(value As Short)
+            l_page = value
+        End Set
+    End Property
+
+    Public Property pages As Short
+        Get
+            Return l_pages
+        End Get
+        Set(value As Short)
+            l_pages = value
+        End Set
+    End Property
+
+    Public Property path As String
+        Get
+            Return l_path
+        End Get
+        Set(value As String)
+            l_path = value
+        End Set
+    End Property
+
+    Public Property rating As SByte
+        Get
+            Return l_rating
+        End Get
+        Set(value As SByte)
+            l_rating = value
+        End Set
+    End Property
+
+    Public Property status As SByte
+        Get
+            Return l_status
+        End Get
+        Set(value As SByte)
+            l_status = value
+        End Set
+    End Property
+
+    Public Property image As Image
+        Get
+            Return l_image
+        End Get
+        Set(value As Image)
+            l_image = value
+        End Set
+    End Property
 
 #End Region
 
@@ -91,6 +207,50 @@
         binnary_writer.Write(file_content)
         'Close file
         binnary_writer.Close()
+    End Sub
+    Private Function getNewId() As Byte()
+        'Get highest value
+        Dim db As New DatabaseManager()
+        Dim maxId As UInteger = db.getMaxId()
+        'Check for overflow
+        'If b_id(0) = &HFF And b_id(1) = &HFF And b_id(2) = &HFF And b_id(3) = &HFF Then
+
+        'End If
+        maxId += 1
+        'check validity
+        Dim b_id As Byte() = BitConverter.GetBytes(maxId)
+        If b_id(0) = &H10 Then
+            b_id(0) += 1
+        End If
+        If b_id(1) = &H10 Then
+            b_id(1) += 1
+        End If
+        If b_id(2) = &H10 Then
+            b_id(2) += 1
+        End If
+        If b_id(3) = &H10 Then
+            b_id(3) += 1
+        End If
+
+        Return b_id
+    End Function
+    Private Sub loadBookData(path As String)
+        Dim doc As New PdfDocument()
+        doc.LoadFromFile(path)
+
+        Dim fileName As String = System.IO.Path.GetFileName(path)
+        Me.l_title = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
+        Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length)
+        Me.l_begin_date = Nothing
+        Me.l_finish_date = Nothing
+        Me.l_notes = ""
+        'Me.l_description = doc.Pages.Item(0).
+        Me.l_page = 0
+        Me.l_pages = doc.Pages.Count()
+        'Me.l_path = TODO
+        Me.l_rating = -1
+        Me.l_status = -1
+        Me.l_image = doc.SaveAsImage(0)
     End Sub
 #End Region
 End Class

@@ -96,16 +96,13 @@ Public Class DatabaseManager
         End Try
     End Function
 
-    Public Function getNewBookId() As UInteger
+    Public Function getMaxId() As UInteger
         Try
             Dim command As SqlCommand = connection.CreateCommand()
             Dim reader As SqlDataReader
-            command.CommandText = "EXECUTE getNewBookId"
-            reader = command.ExecuteReader()
-            Dim id As UInteger = reader.GetInt32(0)
+            command.CommandText = "EXECUTE getMaxId"
+            Dim id As UInteger = command.ExecuteScalar()
 
-
-            reader.Close()
             Return id
         Catch ex As Exception
             MessageBox.Show(ex.Message)
