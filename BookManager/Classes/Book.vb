@@ -249,7 +249,7 @@ Public Class Book
         Me.l_pages = doc.Pages.Count()
         'Me.l_path = TODO
         Me.l_rating = -1
-        Me.l_status = -1
+        Me.l_status = 0
         Me.l_image = doc.SaveAsImage(0)
     End Sub
 #End Region

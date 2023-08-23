@@ -114,5 +114,39 @@
     Public Sub sync()
 
     End Sub
+
+    Public Function GetCompleted() As Integer
+        Dim count As Integer = 0
+        For Each b As Book In books
+            If b.status = status.Completed Then count += 1
+        Next
+        Return count
+    End Function
+
+    Public Function GetReading() As Integer
+        Dim count As Integer = 0
+        For Each b As Book In books
+            If b.status = status.Reading Then count += 1
+        Next
+        Return count
+    End Function
+
+    Public Function GetBookCount() As Integer
+        Return books.Count
+    End Function
+    Public Function GetDropped() As Integer
+        Dim count As Integer = 0
+        For Each b As Book In books
+            If b.status = status.Dropped Then count += 1
+        Next
+        Return count
+    End Function
+    Public Function GetPageCount() As Integer
+        Dim count As Integer = 0
+        For Each b As Book In books
+            count += b.page
+        Next
+        Return count
+    End Function
 #End Region
 End Class
