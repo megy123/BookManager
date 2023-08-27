@@ -109,4 +109,9 @@ Public Class DatabaseManager
         End Try
     End Function
 
+    Public Function checkBook() As Boolean
+
+    End Function
+
+
 End Class

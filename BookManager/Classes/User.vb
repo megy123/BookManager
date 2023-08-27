@@ -17,6 +17,12 @@
         db.getUserFavBooks(Me.favourite)
     End Sub
 
+
+    Public Sub New(b As Boolean)
+        Me.l_lib_path = "C:\Users\domin\Desktop\bookshelf"
+        sync()
+    End Sub
+
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
         Me.l_last_sync = l_last_sync
         Me.l_last_read = l_last_read
@@ -96,6 +102,8 @@
 #End Region
 
 #Region "Methods"
+
+    'Public methods
     Public Sub addBook()
 
     End Sub
@@ -112,7 +120,32 @@
 
     End Sub
     Public Sub sync()
+        Dim local_books As List(Of String)
+        local_books = getAllFiles(lib_path)
+        Dim bookIndex As Integer = 1
 
+        'syncform init
+        Dim sync_form As Syncing = New Syncing()
+        sync_form.Label2.Text = "0/" & local_books.Count
+        sync_form.Label3.Text = ""
+        sync_form.Label4.Text = ""
+        sync_form.Button1.Enabled = False
+        sync_form.Button2.Enabled = False
+        sync_form.Show()
+
+
+        For Each s As String In local_books
+            Dim fileName As String = System.IO.Path.GetFileName(s)
+            sync_form.Label2.Text = bookIndex & "/" & local_books.Count
+            sync_form.Label3.Text = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
+            sync_form.Label4.Text = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length)
+            bookIndex += 1
+
+            Dim dm As New DatabaseManager()
+            If dm.checkBook = False Then
+
+            End If
+        Next
     End Sub
 
     Public Function GetCompleted() As Integer
@@ -122,7 +155,6 @@
         Next
         Return count
     End Function
-
     Public Function GetReading() As Integer
         Dim count As Integer = 0
         For Each b As Book In books
@@ -130,7 +162,6 @@
         Next
         Return count
     End Function
-
     Public Function GetBookCount() As Integer
         Return books.Count
     End Function
@@ -147,6 +178,19 @@
             count += b.page
         Next
         Return count
+    End Function
+
+    'Private methods
+    Private Function getAllFiles(path As String) As List(Of String)
+        Dim files As New List(Of String)
+        For Each f As String In IO.Directory.GetFiles(path)
+            files.Add(f)
+        Next
+        For Each d As String In IO.Directory.GetDirectories(path)
+            files.AddRange(getAllFiles(d))
+        Next
+
+        Return files
     End Function
 #End Region
 End Class
