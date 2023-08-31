@@ -22,6 +22,12 @@
         Materpeace
     End Enum
 
+    Public statusArr As String() = {"None",
+                                    "Reading",
+                                    "Completed",
+                                    "Dropped",
+                                    "Hold"}
+
     Public ratingArr As String() = {"None",
                               "(1)Appalling",
                               "(2)Horrible",

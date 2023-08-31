@@ -53,3 +53,9 @@ CREATE TABLE BM_Favts (
 );
 
 Synchronizácia
+
+
+TODO:
+-Search
+-Settings
+-Favourite

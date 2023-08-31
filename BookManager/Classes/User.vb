@@ -175,6 +175,13 @@ Public Class User
         Return count
     End Function
 
+    Public Function getBookByTitle(title As String) As Book
+        For Each b As Book In books
+            If b.title = title Then Return b
+        Next
+        Return Nothing
+    End Function
+
     'Private methods
     Private Function getAllFiles(path As String) As List(Of String)
         Dim files As New List(Of String)

@@ -195,7 +195,7 @@ Public Class Book
         End If
     End Function
     Public Function getCategory() As String
-        Return path.Split("/")(path.Count(Function(c As Char) c = "/"))
+        Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1)
     End Function
     Private Sub assignIdToBook(id As UInteger, path As String)
         'Initilize variables
@@ -244,7 +244,7 @@ Public Class Book
 
         Dim fileName As String = System.IO.Path.GetFileName(path)
         Me.l_title = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
-        Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split(".")(0).Split("-")(1).Length - 5) '4 from '.pdf' 1 for beggining
+        Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length - 5) '4 from '.pdf' 1 for beggining
         'Me.l_begin_date = Nothing
         'Me.l_finish_date = Nothing
         'Me.l_notes = ""
