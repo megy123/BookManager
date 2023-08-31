@@ -179,21 +179,26 @@ Public Class Book
 #End Region
 
 #Region "Methods"
+    Public Function getStartDate() As String
+        If begin_date = Nothing Then
+            Return "-"
+        Else
+            Return Format(begin_date, "d.m.yyyy")
+        End If
+    End Function
+    Public Function getFinishDate() As String
+        If finish_date = Nothing Then
+            Return "-"
+        Else
+            Return Format(finish_date, "d.m.yyyy")
+        End If
+    End Function
+    Public Function getCategory() As String
+        Return path.Split("/")(path.Count(Function(c As Char) c = "/"))
+    End Function
     Public Function getProgress() As Byte
 
     End Function
-
-    'Public Function getState()
-    '    Select Case page
-    '        Case 0
-    '            Return bookState.none
-    '        Case pages
-    '            Return bookState.finished
-    '        Case Else
-    '            Return bookState.reading
-    '    End Select
-    'End Function
-
     Private Sub assignIdToBook(id As UInteger, path As String)
         'Initilize variables
         Dim file_content As Byte() = My.Computer.FileSystem.ReadAllBytes(path)
