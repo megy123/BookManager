@@ -93,7 +93,6 @@
   <ItemGroup>
     <Compile Include="Classes\Book.vb" />
     <Compile Include="Classes\Constants.vb" />
-    <Compile Include="Classes\DatabaseManager.vb" />
     <Compile Include="Classes\DataManager.vb" />
     <Compile Include="Classes\User.vb" />
     <Compile Include="Forms\BookDetail.Designer.vb">
@@ -168,13 +167,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BookManagerDatabase.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BookManagerDatabase_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>BookManagerDatabase.mdf</DependentUpon>
-    </Content>
     <Content Include="info.txt" />
   </ItemGroup>
   <ItemGroup>

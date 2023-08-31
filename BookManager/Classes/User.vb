@@ -1,4 +1,5 @@
-﻿Public Class User
+﻿Imports System.Xml
+Public Class User
     Dim l_last_sync As Date
     Dim l_last_read As Date
     Dim l_startup_sync As Boolean
@@ -11,16 +12,10 @@
 
 #Region "Constructors"
     Public Sub New()
-        Dim db As New DatabaseManager()
-        db.getUserData(Me)
-        db.getUserBooks(Me.books)
-        db.getUserFavBooks(Me.favourite)
-    End Sub
-
-
-    Public Sub New(b As Boolean)
-        Me.l_lib_path = "C:\Users\domin\Desktop\bookshelf"
-        sync()
+        Dim container As XDocument = getDataContainer()
+        loadUserData(container)
+        loadUserBooks(container)
+        loadUserFavouriteBooks(container)
     End Sub
 
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
@@ -104,49 +99,49 @@
 #Region "Methods"
 
     'Public methods
-    Public Sub addBook()
+    'Public Sub addBook()
 
-    End Sub
-    Public Sub removeBook()
+    'End Sub
+    'Public Sub removeBook()
 
-    End Sub
-    Public Sub editBook()
+    'End Sub
+    'Public Sub editBook()
 
-    End Sub
-    Public Sub addToFavourite()
+    'End Sub
+    'Public Sub addToFavourite()
 
-    End Sub
-    Public Sub removeFromFavourite()
+    'End Sub
+    'Public Sub removeFromFavourite()
 
-    End Sub
-    Public Sub sync()
-        Dim local_books As List(Of String)
-        local_books = getAllFiles(lib_path)
-        Dim bookIndex As Integer = 1
+    'End Sub
+    'Public Sub sync()
+    '    Dim local_books As List(Of String)
+    '    local_books = getAllFiles(lib_path)
+    '    Dim bookIndex As Integer = 1
 
-        'syncform init
-        Dim sync_form As Syncing = New Syncing()
-        sync_form.Label2.Text = "0/" & local_books.Count
-        sync_form.Label3.Text = ""
-        sync_form.Label4.Text = ""
-        sync_form.Button1.Enabled = False
-        sync_form.Button2.Enabled = False
-        sync_form.Show()
+    '    'syncform init
+    '    Dim sync_form As Syncing = New Syncing()
+    '    sync_form.Label2.Text = "0/" & local_books.Count
+    '    sync_form.Label3.Text = ""
+    '    sync_form.Label4.Text = ""
+    '    sync_form.Button1.Enabled = False
+    '    sync_form.Button2.Enabled = False
+    '    sync_form.Show()
 
 
-        For Each s As String In local_books
-            Dim fileName As String = System.IO.Path.GetFileName(s)
-            sync_form.Label2.Text = bookIndex & "/" & local_books.Count
-            sync_form.Label3.Text = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
-            sync_form.Label4.Text = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length)
-            bookIndex += 1
+    '    For Each s As String In local_books
+    '        Dim fileName As String = System.IO.Path.GetFileName(s)
+    '        sync_form.Label2.Text = bookIndex & "/" & local_books.Count
+    '        sync_form.Label3.Text = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
+    '        sync_form.Label4.Text = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length)
+    '        bookIndex += 1
 
-            Dim dm As New DatabaseManager()
-            If dm.checkBook = False Then
+    '        Dim dm As New DatabaseManager()
+    '        If dm.checkBook = False Then
 
-            End If
-        Next
-    End Sub
+    '        End If
+    '    Next
+    'End Sub
 
     Public Function GetCompleted() As Integer
         Dim count As Integer = 0
@@ -192,5 +187,63 @@
 
         Return files
     End Function
+    Private Function getDataContainer() As XDocument
+        If (IO.File.Exists("DataContainer.xml")) Then
+            Return XDocument.Load("DataContainer.xml")
+        Else
+            Dim doc As New XDocument(
+                New XComment("User data."),
+                New XElement("User",
+                    New XElement("LastSynchronization", "-"),
+                    New XElement("LastRead", "-"),
+                    New XElement("StartupSynchronization", True),
+                    New XElement("ConfirmSynchronization", False),
+                    New XElement("LibraryPath", ""),
+                    New XElement("HighestId", 0),
+                    New XComment("User books."),
+                    New XElement("Books"),
+                    New XComment("User favourite books."),
+                    New XElement("FavouriteBooks")
+                )
+            )
+
+            doc.Save("DataContainer.xml")
+
+            Return doc
+        End If
+    End Function
+    Private Sub loadUserData(doc As XDocument)
+        If doc.Root.Element("LastSynchronization").Value = "-" Then
+            last_sync = Nothing
+        Else
+            last_sync = Convert.ToDateTime(doc.Root.Element("LastSynchronization").Value)
+        End If
+
+        If doc.Root.Element("LastRead").Value = "-" Then
+            last_read = Nothing
+        Else
+            last_read = Convert.ToDateTime(doc.Root.Element("LastRead").Value)
+        End If
+
+        startup_sync = doc.Root.Element("StartupSynchronization").Value
+        confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
+        lib_path = doc.Root.Element("LibraryPath").Value
+    End Sub
+
+    Private Sub loadUserBooks(doc As XDocument)
+        books = New List(Of Book)
+
+        Dim local_books As List(Of String)
+        local_books = getAllFiles(lib_path)
+
+        For Each s As String In local_books
+            Dim b As New Book(s, doc)
+            books.Add(b)
+        Next
+    End Sub
+
+    Private Sub loadUserFavouriteBooks(doc As XDocument)
+        favourite = New List(Of Book)
+    End Sub
 #End Region
 End Class
