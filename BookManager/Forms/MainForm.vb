@@ -2,9 +2,10 @@
     Dim user As User
     Dim selectedBook As Book
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
         selectedBook = Nothing
         user = New User()
+
+        AddHandler user.favouriteChanged, AddressOf favouriteChanged
         'display data
         If user.last_read = Nothing Then
             Label7.Text = "You have never ever read."
@@ -49,6 +50,7 @@
 
         TreeView1.ExpandAll()
         bookSelectionChange(False)
+        favouriteChanged()
         Label1.Text = "Status: Up to date"
         'MessageBox.Show(user.lib_path)
         'Dim bok As New Book("C:\Users\domin\Desktop\test.pdf")
@@ -82,7 +84,7 @@
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         'Book info button
         If selectedBook IsNot Nothing Then
-            Dim bookinfo As New BookDetail(selectedBook)
+            Dim bookinfo As New BookDetail(selectedBook, user)
             bookinfo.Show()
         End If
     End Sub
@@ -98,12 +100,28 @@
 
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         'Book selecion frontend changes
+        ListBox1.SelectedIndex = -1
         If TreeView1.SelectedNode.Nodes.Count = 0 Then
             selectedBook = user.getBookByTitle(TreeView1.SelectedNode.Text)
             bookSelectionChange(True)
         Else
             selectedBook = Nothing
             bookSelectionChange(False)
+        End If
+    End Sub
+
+    Private Sub favouriteChanged()
+        ListBox1.Items.Clear()
+        For Each b As Book In user.favourite
+            ListBox1.Items.Add(b.title)
+        Next
+    End Sub
+
+    Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
+        'Favourite books
+        If ListBox1.SelectedIndex > -1 Then
+            selectedBook = user.getBookByTitle(ListBox1.SelectedItem)
+            bookSelectionChange(True)
         End If
     End Sub
 End Class

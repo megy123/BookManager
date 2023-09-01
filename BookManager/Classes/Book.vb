@@ -3,8 +3,8 @@ Public Class Book
     Dim l_id As UInteger
     Dim l_title As String
     Dim l_autor As String
-    Dim l_begin_date As Date
-    Dim l_finish_date As Date
+    Dim l_begin_date As Date?
+    Dim l_finish_date As Date?
     Dim l_notes As String
     Dim l_description As String
     Dim l_page As Short
@@ -87,21 +87,27 @@ Public Class Book
         End Set
     End Property
 
-    Public Property begin_date As Date
+    Public Property begin_date As Date?
         Get
             Return l_begin_date
         End Get
-        Set(value As Date)
+        Set(value As Date?)
             l_begin_date = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("BeginDate").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
-    Public Property finish_date As Date
+    Public Property finish_date As Date?
         Get
             Return l_finish_date
         End Get
-        Set(value As Date)
+        Set(value As Date?)
             l_finish_date = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("FinishDate").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -111,6 +117,9 @@ Public Class Book
         End Get
         Set(value As String)
             l_notes = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("Notes").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -129,6 +138,9 @@ Public Class Book
         End Get
         Set(value As Short)
             l_page = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("Page").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -156,6 +168,9 @@ Public Class Book
         End Get
         Set(value As SByte)
             l_rating = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("Rating").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -165,6 +180,9 @@ Public Class Book
         End Get
         Set(value As SByte)
             l_status = value
+            Dim container As XDocument = XDocument.Load("DataContainer.xml")
+            container.Root.Element("Books").Element("ID" & Me.l_id).Element("Status").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -181,17 +199,17 @@ Public Class Book
 
 #Region "Methods"
     Public Function getStartDate() As String
-        If begin_date = Nothing Then
+        If begin_date Is Nothing Then
             Return "-"
         Else
-            Return Format(begin_date, "d.m.yyyy")
+            Return Format(begin_date, "d.M.yyyy")
         End If
     End Function
     Public Function getFinishDate() As String
-        If finish_date = Nothing Then
+        If finish_date Is Nothing Then
             Return "-"
         Else
-            Return Format(finish_date, "d.m.yyyy")
+            Return Format(finish_date, "d.M.yyyy")
         End If
     End Function
     Public Function getCategory() As String
@@ -274,23 +292,21 @@ Public Class Book
 
         'load data from container
         If doc.Root.Element("Books").Element("ID" & id).Element("BeginDate").Value = "-" Then
-            begin_date = Nothing
+            l_begin_date = Nothing
         Else
-            begin_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id).Element("BeginDate").Value)
+            l_begin_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id).Element("BeginDate").Value)
         End If
 
         If doc.Root.Element("Books").Element("ID" & id).Element("FinishDate").Value = "-" Then
-            finish_date = Nothing
+            l_finish_date = Nothing
         Else
-            finish_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id).Element("FinishDate").Value)
+            l_finish_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id).Element("FinishDate").Value)
         End If
 
-        page = doc.Root.Element("Books").Element("ID" & id).Element("Page").Value
-        rating = doc.Root.Element("Books").Element("ID" & id).Element("Rating").Value
-        status = doc.Root.Element("Books").Element("ID" & id).Element("Status").Value
-        notes = doc.Root.Element("Books").Element("ID" & id).Element("Notes").Value
+        l_page = doc.Root.Element("Books").Element("ID" & id).Element("Page").Value
+        l_rating = doc.Root.Element("Books").Element("ID" & id).Element("Rating").Value
+        l_status = doc.Root.Element("Books").Element("ID" & id).Element("Status").Value
+        l_notes = doc.Root.Element("Books").Element("ID" & id).Element("Notes").Value
     End Sub
-
-
 #End Region
 End Class

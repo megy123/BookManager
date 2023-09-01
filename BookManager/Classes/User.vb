@@ -1,5 +1,7 @@
 ﻿Imports System.Xml
 Public Class User
+    Public Event favouriteChanged()
+
     Dim l_last_sync As Date
     Dim l_last_read As Date
     Dim l_startup_sync As Boolean
@@ -16,6 +18,7 @@ Public Class User
         loadUserData(container)
         loadUserBooks(container)
         loadUserFavouriteBooks(container)
+
     End Sub
 
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
@@ -108,12 +111,8 @@ Public Class User
     'Public Sub editBook()
 
     'End Sub
-    'Public Sub addToFavourite()
 
-    'End Sub
-    'Public Sub removeFromFavourite()
 
-    'End Sub
     'Public Sub sync()
     '    Dim local_books As List(Of String)
     '    local_books = getAllFiles(lib_path)
@@ -143,6 +142,20 @@ Public Class User
     '    Next
     'End Sub
 
+    Public Sub addToFavourite(b As Book)
+        favourite.Add(b)
+        Dim container As XDocument = getDataContainer()
+        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id))
+        container.Save("DataContainer.xml")
+        RaiseEvent favouriteChanged()
+    End Sub
+    Public Sub removeFromFavourite(b As Book)
+        favourite.Remove(b)
+        Dim container As XDocument = getDataContainer()
+        container.Root.Element("FavouriteBooks").Element("ID" & b.id).Remove()
+        container.Save("DataContainer.xml")
+        RaiseEvent favouriteChanged()
+    End Sub
     Public Function GetCompleted() As Integer
         Dim count As Integer = 0
         For Each b As Book In books
@@ -180,6 +193,20 @@ Public Class User
             If b.title = title Then Return b
         Next
         Return Nothing
+    End Function
+
+    Public Function getBookById(id As Integer) As Book
+        For Each b As Book In books
+            If b.id = id Then Return b
+        Next
+        Return Nothing
+    End Function
+
+    Public Function isFavourite(b As Book) As Boolean
+        For Each book As Book In favourite
+            If book Is b Then Return True
+        Next
+        Return False
     End Function
 
     'Private methods
@@ -251,6 +278,12 @@ Public Class User
 
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
+        For Each fb As XElement In doc.Root.Element("FavouriteBooks").Elements
+            Dim book As Book = getBookById(Integer.Parse(fb.Name.LocalName.Substring(2)))
+            If Not IsNothing(book) Then
+                favourite.Add(book)
+            End If
+        Next
     End Sub
 #End Region
 End Class

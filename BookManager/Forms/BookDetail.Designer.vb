@@ -41,6 +41,7 @@ Partial Class BookDetail
         Me.Button2 = New System.Windows.Forms.Button()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.RichTextBox2 = New System.Windows.Forms.RichTextBox()
+        Me.Button4 = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericUpDown1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -245,11 +246,21 @@ Partial Class BookDetail
         Me.RichTextBox2.TabIndex = 19
         Me.RichTextBox2.Text = ""
         '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(368, 453)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 20
+        Me.Button4.Text = "Button4"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'BookDetail
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1067, 524)
+        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.RichTextBox2)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Button2)
@@ -299,4 +310,5 @@ Partial Class BookDetail
     Friend WithEvents Button2 As Button
     Friend WithEvents Button3 As Button
     Friend WithEvents RichTextBox2 As RichTextBox
+    Friend WithEvents Button4 As Button
 End Class
