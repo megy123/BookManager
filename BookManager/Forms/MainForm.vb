@@ -103,7 +103,8 @@
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         'Settings button
-        Settings.Show()
+        Dim setin As New Settings(user)
+        setin.Show()
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs)

@@ -144,6 +144,9 @@
     <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings.resx">
+      <DependentUpon>Settings.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Syncing.resx">
       <DependentUpon>Syncing.vb</DependentUpon>
     </EmbeddedResource>

@@ -120,6 +120,7 @@ Partial Class Settings
         '
         'Button4
         '
+        Me.Button4.Enabled = False
         Me.Button4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
         Me.Button4.Location = New System.Drawing.Point(9, 213)
         Me.Button4.Name = "Button4"

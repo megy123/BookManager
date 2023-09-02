@@ -3,8 +3,8 @@ Public Class User
     Public Event favouriteChanged()
     Public Event lastReadUpdated()
 
-    Dim l_last_sync As Date
-    Dim l_last_read As Date
+    Dim l_last_sync As Date?
+    Dim l_last_read As Date?
     Dim l_startup_sync As Boolean
     Dim l_confirm_sync As Boolean
     Dim l_lib_path As String
@@ -35,23 +35,36 @@ Public Class User
 #End Region
 
 #Region "Properties"
-    Public Property last_sync As Date
+    Public Property last_sync As Date?
         Get
             Return l_last_sync
         End Get
-        Set(value As Date)
+        Set(value As Date?)
             l_last_sync = value
+            Dim container As XDocument = getDataContainer()
+            If value Is Nothing Then
+                container.Root.Element("LastSynchronization").Value = "-"
+            Else
+                container.Root.Element("LastSynchronization").Value = value
+            End If
+
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
-    Public Property last_read As Date
+    Public Property last_read As Date?
         Get
             Return l_last_read
         End Get
-        Set(value As Date)
+        Set(value As Date?)
             l_last_read = value
             Dim container As XDocument = getDataContainer()
-            container.Root.Element("LastRead").Value = value
+            If value Is Nothing Then
+                container.Root.Element("LastRead").Value = "-"
+            Else
+                container.Root.Element("LastRead").Value = value
+            End If
+
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -62,6 +75,9 @@ Public Class User
         End Get
         Set(value As Boolean)
             l_startup_sync = value
+            Dim container As XDocument = getDataContainer()
+            container.Root.Element("StartupSynchronization").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -71,6 +87,9 @@ Public Class User
         End Get
         Set(value As Boolean)
             l_confirm_sync = value
+            Dim container As XDocument = getDataContainer()
+            container.Root.Element("ConfirmSynchronization").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -80,6 +99,9 @@ Public Class User
         End Get
         Set(value As String)
             l_lib_path = value
+            Dim container As XDocument = getDataContainer()
+            container.Root.Element("LibraryPath").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -106,15 +128,6 @@ Public Class User
 #Region "Methods"
 
     'Public methods
-    'Public Sub addBook()
-
-    'End Sub
-    'Public Sub removeBook()
-
-    'End Sub
-    'Public Sub editBook()
-
-    'End Sub
 
 
     'Public Sub sync()
