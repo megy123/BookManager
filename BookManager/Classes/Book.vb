@@ -1,5 +1,8 @@
 ﻿Imports Spire.Pdf
 Public Class Book
+    Public Event readDateChanged()
+    Public Event bookRead()
+
     Dim l_id As UInteger
     Dim l_title As String
     Dim l_autor As String
@@ -138,6 +141,7 @@ Public Class Book
         End Get
         Set(value As Short)
             l_page = value
+            RaiseEvent bookRead()
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
             container.Root.Element("Books").Element("ID" & Me.l_id).Element("Page").Value = value
             container.Save("DataContainer.xml")
@@ -209,7 +213,7 @@ Public Class Book
         If finish_date Is Nothing Then
             Return "-"
         Else
-            Return Format(finish_date, "d.M.yyyy")
+            Return Format(finish_date, "d.M .yyyy")
         End If
     End Function
     Public Function getCategory() As String

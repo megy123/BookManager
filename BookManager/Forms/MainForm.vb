@@ -1,16 +1,28 @@
 ﻿Public Class MainForm
     Dim user As User
     Dim selectedBook As Book
+    Dim WithEvents searchBox As ListBox
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         selectedBook = Nothing
         user = New User()
 
+        'Handlers
         AddHandler user.favouriteChanged, AddressOf favouriteChanged
+        AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
+        'Search box setup
+        searchBox = New ListBox()
+        Me.Controls.Add(searchBox)
+        searchBox.Hide()
+        searchBox.BringToFront()
+        searchBox.Name = "Searchbox"
+        searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
+        searchBox.Size = New Size(TextBox1.Size.Width, 1000)
+
         'display data
         If user.last_read = Nothing Then
             Label7.Text = "You have never ever read."
         Else
-            Label7.Text = "You read lately on " & Format(user.last_read, "d. mmmm yyyy") & "."
+            Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
         End If
 
         For Each b As Book In user.favourite
@@ -94,7 +106,7 @@
         Settings.Show()
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
         'Search button
     End Sub
 
@@ -117,11 +129,58 @@
         Next
     End Sub
 
+    Private Sub lastReadUpdated()
+        Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
+    End Sub
+
     Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
         'Favourite books
         If ListBox1.SelectedIndex > -1 Then
             selectedBook = user.getBookByTitle(ListBox1.SelectedItem)
             bookSelectionChange(True)
         End If
+    End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        'Search
+        If TextBox1.Text = "" Then
+            searchBox.Hide()
+        Else
+            Dim searchedBooks As List(Of Book) = user.searchBooks(TextBox1.Text)
+            If searchedBooks.Count = 0 Then
+                searchBox.Hide()
+            Else
+                searchBox.Items.Clear()
+                For Each b As Book In searchedBooks
+                    searchBox.Items.Add(b.title)
+                Next
+                searchBox.Size = New Size(searchBox.Size.Width, (searchedBooks.Count + 1) * searchBox.ItemHeight + 2)
+                searchBox.SelectedIndex = 0
+                searchBox.Show()
+            End If
+        End If
+    End Sub
+
+    Private Sub searchbox_select() Handles searchBox.SelectedIndexChanged
+        If searchBox.SelectedIndex > -1 Then
+            selectedBook = user.getBookByTitle(searchBox.SelectedItem)
+            bookSelectionChange(True)
+        End If
+    End Sub
+
+    Private Sub searchbox_keyboard(sender As Object, e As KeyEventArgs) Handles TextBox1.KeyDown
+        If e.KeyCode = Keys.Down Then
+            If searchBox.SelectedIndex < searchBox.Items.Count - 1 Then
+                searchBox.SelectedIndex += 1
+            End If
+        ElseIf e.KeyCode = Keys.Up Then
+            If searchBox.SelectedIndex > 0 Then
+                searchBox.SelectedIndex -= 1
+            End If
+        End If
+    End Sub
+
+    Private Sub TextBox1_Leave(sender As Object, e As EventArgs) Handles TextBox1.Leave
+        searchBox.Hide()
     End Sub
 End Class

@@ -1,6 +1,7 @@
 ﻿Imports System.Xml
 Public Class User
     Public Event favouriteChanged()
+    Public Event lastReadUpdated()
 
     Dim l_last_sync As Date
     Dim l_last_read As Date
@@ -49,6 +50,9 @@ Public Class User
         End Get
         Set(value As Date)
             l_last_read = value
+            Dim container As XDocument = getDataContainer()
+            container.Root.Element("LastRead").Value = value
+            container.Save("DataContainer.xml")
         End Set
     End Property
 
@@ -141,7 +145,17 @@ Public Class User
     '        End If
     '    Next
     'End Sub
+    Public Function searchBooks(title As String) As List(Of Book)
+        Dim b As New List(Of Book)
 
+        For Each book As Book In books
+            If book.title.StartsWith(title) Then
+                b.Add(book)
+            End If
+        Next
+
+        Return b
+    End Function
     Public Sub addToFavourite(b As Book)
         favourite.Add(b)
         Dim container As XDocument = getDataContainer()
@@ -272,6 +286,7 @@ Public Class User
 
         For Each s As String In local_books
             Dim b As New Book(s, doc)
+            AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
             books.Add(b)
         Next
     End Sub
@@ -284,6 +299,11 @@ Public Class User
                 favourite.Add(book)
             End If
         Next
+    End Sub
+
+    Private Sub lastReadUpdatedHandler()
+        last_read = My.Computer.Clock.LocalTime
+        RaiseEvent lastReadUpdated()
     End Sub
 #End Region
 End Class

@@ -87,13 +87,11 @@
         Else
             ReadBookGuiChange(False)
         End If
-        If ComboBox2.SelectedIndex = status.Completed And IsNothing(book.finish_date) Then
-            MessageBox.Show("fin")
+        If ComboBox2.SelectedIndex = status.Completed And book.finish_date Is Nothing Then
             book.finish_date = My.Computer.Clock.LocalTime
             Label8.Text = "Completed on: " & book.getFinishDate()
         End If
-        If ComboBox2.SelectedIndex = status.Reading And IsNothing(book.begin_date) Then
-            MessageBox.Show("beg")
+        If ComboBox2.SelectedIndex = status.Reading And book.begin_date Is Nothing Then
             book.begin_date = My.Computer.Clock.LocalTime
             Label7.Text = "Started on: " & book.getStartDate()
         End If
@@ -118,15 +116,5 @@
 
     Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
         book.notes = RichTextBox1.Text
-    End Sub
-
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        Dim randdate? As Date
-        randdate = Nothing
-
-        If randdate Is Nothing Then
-            MessageBox.Show("Nohing")
-
-        End If
     End Sub
 End Class
