@@ -2,24 +2,37 @@
     Dim user As User
     Dim selectedBook As Book
     Dim WithEvents searchBox As ListBox
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        selectedBook = Nothing
-        user = New User()
 
-        'Handlers
-        AddHandler user.favouriteChanged, AddressOf favouriteChanged
-        AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
-        'Search box setup
-        searchBox = New ListBox()
-        Me.Controls.Add(searchBox)
-        searchBox.Hide()
-        searchBox.BringToFront()
-        searchBox.Name = "Searchbox"
-        searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
-        searchBox.Size = New Size(TextBox1.Size.Width, 1000)
+#Region "Methods"
+    Private Sub favouriteChanged()
+        ListBox1.Items.Clear()
+        For Each b As Book In user.favourite
+            ListBox1.Items.Add(b.title)
+        Next
+    End Sub
 
+    Private Sub lastReadUpdated()
+        Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
+    End Sub
+
+    Private Sub bookSelectionChange(isBook As Boolean)
+        If isBook = False Then
+            GroupBox2.Enabled = False
+            Label9.Text = "Title:"
+            Label10.Text = "Author:"
+            Label11.Text = "Satus:"
+
+        Else
+            GroupBox2.Enabled = True
+            Label9.Text = "Title: " & selectedBook.title
+            Label10.Text = "Author: " & selectedBook.autor
+            Label11.Text = "Satus: " & [Enum].GetName(GetType(status), selectedBook.status)
+        End If
+    End Sub
+
+    Private Sub guiInit()
         'display data
-        If user.last_read = Nothing Then
+        If user.last_read Is Nothing Then
             Label7.Text = "You have never ever read."
         Else
             Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
@@ -64,26 +77,26 @@
         bookSelectionChange(False)
         favouriteChanged()
         Label1.Text = "Status: Up to date"
-        'MessageBox.Show(user.lib_path)
-        'Dim bok As New Book("C:\Users\domin\Desktop\test.pdf")
-        'Dim bok As New Book("C:\Users\domin\Desktop\Ask for More 10 Questions to Negotiate Anything - Alexandra Carter.pdf")
-        'Dim bok2 As New Book("C:\Users\domin\Desktop\Neuromancer - William Gibson.pdf")
-
     End Sub
 
-    Private Sub bookSelectionChange(isBook As Boolean)
-        If isBook = False Then
-            GroupBox2.Enabled = False
-            Label9.Text = "Title:"
-            Label10.Text = "Author:"
-            Label11.Text = "Satus:"
+#End Region
+#Region "Controls"
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        selectedBook = Nothing
+        user = New User()
 
-        Else
-            GroupBox2.Enabled = True
-            Label9.Text = "Title: " & selectedBook.title
-            Label10.Text = "Author: " & selectedBook.autor
-            Label11.Text = "Satus: " & [Enum].GetName(GetType(status), selectedBook.status)
-        End If
+        'Handlers
+        AddHandler user.favouriteChanged, AddressOf favouriteChanged
+        AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
+        'Search box setup
+        searchBox = New ListBox()
+        Me.Controls.Add(searchBox)
+        searchBox.Hide()
+        searchBox.BringToFront()
+        searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
+        searchBox.Size = New Size(TextBox1.Size.Width, 1000)
+
+        guiInit()
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -107,10 +120,6 @@
         setin.Show()
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
-        'Search button
-    End Sub
-
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         'Book selecion frontend changes
         ListBox1.SelectedIndex = -1
@@ -121,17 +130,6 @@
             selectedBook = Nothing
             bookSelectionChange(False)
         End If
-    End Sub
-
-    Private Sub favouriteChanged()
-        ListBox1.Items.Clear()
-        For Each b As Book In user.favourite
-            ListBox1.Items.Add(b.title)
-        Next
-    End Sub
-
-    Private Sub lastReadUpdated()
-        Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
     End Sub
 
     Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
@@ -184,4 +182,7 @@
     Private Sub TextBox1_Leave(sender As Object, e As EventArgs) Handles TextBox1.Leave
         searchBox.Hide()
     End Sub
+
+
+#End Region
 End Class

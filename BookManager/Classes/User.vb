@@ -158,6 +158,9 @@ Public Class User
     '        End If
     '    Next
     'End Sub
+    Public Sub sync()
+        last_sync = My.Computer.Clock.LocalTime
+    End Sub
     Public Function searchBooks(title As String) As List(Of Book)
         Dim b As New List(Of Book)
 

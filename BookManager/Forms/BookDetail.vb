@@ -2,21 +2,31 @@
 
     Dim user As User
     Dim book As Book
-    Public Sub New(b As Book, u As User)
 
-        ' This call is required by the designer.
-        InitializeComponent()
+#Region "Methods"
 
-        ' Add any initialization after the InitializeComponent() call.
-        book = b
-        user = u
+    Private Sub ReadBookGuiChange(isRead As Boolean)
+        If isRead Then
+            Label1.Enabled = True
+            Label3.Enabled = True
+            NumericUpDown1.Enabled = True
+            ComboBox1.Enabled = True
+        Else
+            Label1.Enabled = False
+            Label3.Enabled = False
+            NumericUpDown1.Enabled = False
+            ComboBox1.Enabled = False
+        End If
+    End Sub
 
-
+    Public Sub guiInit()
         'Set up gui
+        ComboBox1.Items.Clear()
+        ComboBox2.Items.Clear()
         ComboBox2.Items.AddRange(statusArr)
         ComboBox1.Items.AddRange(ratingArr)
-        If b.status = status.None Then
-            ReadBookGuiChange(False)
+        If book.status = status.Reading Then
+            ReadBookGuiChange(True)
         End If
         If user.isFavourite(book) Then
             Button1.Text = "Remove from favourite"
@@ -41,21 +51,20 @@
         Label10.Text = "/" & book.pages
         ComboBox1.SelectedIndex = book.rating
         ComboBox2.SelectedIndex = book.status
-
     End Sub
 
-    Private Sub ReadBookGuiChange(isRead As Boolean)
-        If isRead Then
-            Label1.Enabled = True
-            Label3.Enabled = True
-            NumericUpDown1.Enabled = True
-            ComboBox1.Enabled = True
-        Else
-            Label1.Enabled = False
-            Label3.Enabled = False
-            NumericUpDown1.Enabled = False
-            ComboBox1.Enabled = False
-        End If
+#End Region
+
+#Region "Controls"
+    Public Sub New(b As Book, u As User)
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+        book = b
+        user = u
+        guiInit()
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -117,4 +126,6 @@
     Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
         book.notes = RichTextBox1.Text
     End Sub
+#End Region
+
 End Class
