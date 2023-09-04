@@ -145,7 +145,7 @@
         If TextBox1.Text = "" Then
             searchBox.Hide()
         Else
-            Dim searchedBooks As List(Of Book) = user.searchBooks(TextBox1.Text)
+            Dim searchedBooks As List(Of Book) = user.searchBookByTitle(TextBox1.Text)
             If searchedBooks.Count = 0 Then
                 searchBox.Hide()
             Else

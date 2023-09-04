@@ -19,9 +19,7 @@ Public Class User
         loadUserData(container)
         loadUserBooks(container)
         loadUserFavouriteBooks(container)
-
     End Sub
-
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
         Me.l_last_sync = l_last_sync
         Me.l_last_read = l_last_read
@@ -31,7 +29,6 @@ Public Class User
         Me.l_favourite = l_favourite
         Me.l_books = l_books
     End Sub
-
 #End Region
 
 #Region "Properties"
@@ -51,7 +48,6 @@ Public Class User
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property last_read As Date?
         Get
             Return l_last_read
@@ -68,7 +64,6 @@ Public Class User
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property startup_sync As Boolean
         Get
             Return l_startup_sync
@@ -80,7 +75,6 @@ Public Class User
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property confirm_sync As Boolean
         Get
             Return l_confirm_sync
@@ -92,7 +86,6 @@ Public Class User
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property lib_path As String
         Get
             Return l_lib_path
@@ -104,7 +97,6 @@ Public Class User
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property favourite As List(Of Book)
         Get
             Return l_favourite
@@ -113,7 +105,6 @@ Public Class User
             l_favourite = value
         End Set
     End Property
-
     Public Property books As List(Of Book)
         Get
             Return l_books
@@ -122,46 +113,15 @@ Public Class User
             l_books = value
         End Set
     End Property
-
 #End Region
 
 #Region "Methods"
 
     'Public methods
-
-
-    'Public Sub sync()
-    '    Dim local_books As List(Of String)
-    '    local_books = getAllFiles(lib_path)
-    '    Dim bookIndex As Integer = 1
-
-    '    'syncform init
-    '    Dim sync_form As Syncing = New Syncing()
-    '    sync_form.Label2.Text = "0/" & local_books.Count
-    '    sync_form.Label3.Text = ""
-    '    sync_form.Label4.Text = ""
-    '    sync_form.Button1.Enabled = False
-    '    sync_form.Button2.Enabled = False
-    '    sync_form.Show()
-
-
-    '    For Each s As String In local_books
-    '        Dim fileName As String = System.IO.Path.GetFileName(s)
-    '        sync_form.Label2.Text = bookIndex & "/" & local_books.Count
-    '        sync_form.Label3.Text = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
-    '        sync_form.Label4.Text = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length)
-    '        bookIndex += 1
-
-    '        Dim dm As New DatabaseManager()
-    '        If dm.checkBook = False Then
-
-    '        End If
-    '    Next
-    'End Sub
     Public Sub sync()
         last_sync = My.Computer.Clock.LocalTime
     End Sub
-    Public Function searchBooks(title As String) As List(Of Book)
+    Public Function searchBooksByTitle(title As String) As List(Of Book)
         Dim b As New List(Of Book)
 
         For Each book As Book In books
@@ -174,16 +134,20 @@ Public Class User
     End Function
     Public Sub addToFavourite(b As Book)
         favourite.Add(b)
+        'save to container
         Dim container As XDocument = getDataContainer()
         container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id))
         container.Save("DataContainer.xml")
+
         RaiseEvent favouriteChanged()
     End Sub
     Public Sub removeFromFavourite(b As Book)
         favourite.Remove(b)
+        'save to container
         Dim container As XDocument = getDataContainer()
         container.Root.Element("FavouriteBooks").Element("ID" & b.id).Remove()
         container.Save("DataContainer.xml")
+
         RaiseEvent favouriteChanged()
     End Sub
     Public Function GetCompleted() As Integer
@@ -217,33 +181,34 @@ Public Class User
         Next
         Return count
     End Function
-
     Public Function getBookByTitle(title As String) As Book
+        'skus ptm prerobit
+        'PTM PREROB -- Return WorkOrders.Find(Function(wo As clsWorkOrders) wo.WoNumber = woNumber) IsNot Nothing
         For Each b As Book In books
             If b.title = title Then Return b
         Next
         Return Nothing
     End Function
-
     Public Function getBookById(id As Integer) As Book
+        'wiederholen
         For Each b As Book In books
             If b.id = id Then Return b
         Next
         Return Nothing
     End Function
-
     Public Function isFavourite(b As Book) As Boolean
         For Each book As Book In favourite
             If book Is b Then Return True
         Next
         Return False
     End Function
-
     'Private methods
     Private Function getAllFiles(path As String) As List(Of String)
         Dim files As New List(Of String)
         For Each f As String In IO.Directory.GetFiles(path)
-            files.Add(f)
+            If f.EndsWith(".pdf") Then
+                files.Add(f)
+            End If
         Next
         For Each d As String In IO.Directory.GetDirectories(path)
             files.AddRange(getAllFiles(d))
@@ -252,6 +217,7 @@ Public Class User
         Return files
     End Function
     Private Function getDataContainer() As XDocument
+        'load data container, create if not exists
         If (IO.File.Exists("DataContainer.xml")) Then
             Return XDocument.Load("DataContainer.xml")
         Else
@@ -270,13 +236,12 @@ Public Class User
                     New XElement("FavouriteBooks")
                 )
             )
-
             doc.Save("DataContainer.xml")
-
             Return doc
         End If
     End Function
     Private Sub loadUserData(doc As XDocument)
+        'loads data from container
         If doc.Root.Element("LastSynchronization").Value = "-" Then
             last_sync = Nothing
         Else
@@ -293,7 +258,6 @@ Public Class User
         confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
         lib_path = doc.Root.Element("LibraryPath").Value
     End Sub
-
     Private Sub loadUserBooks(doc As XDocument)
         books = New List(Of Book)
 
@@ -306,7 +270,6 @@ Public Class User
             books.Add(b)
         Next
     End Sub
-
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
         For Each fb As XElement In doc.Root.Element("FavouriteBooks").Elements
@@ -316,10 +279,9 @@ Public Class User
             End If
         Next
     End Sub
-
     Private Sub lastReadUpdatedHandler()
         last_read = My.Computer.Clock.LocalTime
         RaiseEvent lastReadUpdated()
-    End Sub
+    End Sub 'Handler function
 #End Region
 End Class

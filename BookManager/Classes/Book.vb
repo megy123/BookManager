@@ -33,32 +33,26 @@ Public Class Book
         Me.l_rating = l_rating
         Me.l_status = l_status
     End Sub
-
     Public Sub New(path As String, doc As XDocument)
-        Dim fs As New IO.FileStream(path, IO.FileMode.Open)
         'Read header from file
+        Dim fs As New IO.FileStream(path, IO.FileMode.Open)
         Dim binnary_reader As New IO.BinaryReader(fs)
         fs.Position = 0
         Dim header As Byte() = binnary_reader.ReadBytes(8)
-        'MessageBox.Show(Hex(header(0)) & "/" & Hex(header(1)) & "/" & Hex(header(2)) & "/" & Hex(header(3)) & "/" & Hex(header(4)) & "/" & Hex(header(5)) & "/" & Hex(header(6)) & "/" & Hex(header(7)))
         binnary_reader.Close()
         fs.Dispose()
         'Check if header valid and get ID
-        If header(0) = &H25 And header(1) = &HBB And header(7) = &H10 Then
+        If header(0) = &H25 And header(1) = &HBB And header(2) = &H12 And header(7) = &H10 Then
             Me.l_id = BitConverter.ToUInt32(header, 3)
         Else
             Me.l_id = BitConverter.ToUInt32(getNewId(doc), 0) 'db.getNewBookId()
             assignIdToBook(Me.l_id, path)
         End If
 
-        Dim hb As Byte() = BitConverter.GetBytes(Me.l_id)
-        'MessageBox.Show("ID: " & Me.l_id & " HEX: " & Hex(hb(0)) & " " & Hex(hb(1)) & " " & Hex(hb(2)) & " " & Hex(hb(3)))
-
-        loadBookDataOff(doc)
-        loadBookData(path)
-
+        'load book data
+        loadDataFromContainer(doc)
+        loadDataFromBook(path)
     End Sub
-
 
 #End Region
 
@@ -71,7 +65,6 @@ Public Class Book
             l_id = value
         End Set
     End Property
-
     Public Property title As String
         Get
             Return l_title
@@ -80,7 +73,6 @@ Public Class Book
             l_title = value
         End Set
     End Property
-
     Public Property autor As String
         Get
             Return l_autor
@@ -89,7 +81,6 @@ Public Class Book
             l_autor = value
         End Set
     End Property
-
     Public Property begin_date As Date?
         Get
             Return l_begin_date
@@ -101,7 +92,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property finish_date As Date?
         Get
             Return l_finish_date
@@ -113,7 +103,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property notes As String
         Get
             Return l_notes
@@ -125,7 +114,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property description As String
         Get
             Return l_description
@@ -134,7 +122,6 @@ Public Class Book
             l_description = value
         End Set
     End Property
-
     Public Property page As Short
         Get
             Return l_page
@@ -147,7 +134,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property pages As Short
         Get
             Return l_pages
@@ -156,7 +142,6 @@ Public Class Book
             l_pages = value
         End Set
     End Property
-
     Public Property path As String
         Get
             Return l_path
@@ -165,7 +150,6 @@ Public Class Book
             l_path = value
         End Set
     End Property
-
     Public Property rating As SByte
         Get
             Return l_rating
@@ -177,7 +161,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property status As SByte
         Get
             Return l_status
@@ -189,7 +172,6 @@ Public Class Book
             container.Save("DataContainer.xml")
         End Set
     End Property
-
     Public Property image As Image
         Get
             Return l_image
@@ -202,6 +184,7 @@ Public Class Book
 #End Region
 
 #Region "Methods"
+    'Public
     Public Function getStartDate() As String
         If begin_date Is Nothing Then
             Return "-"
@@ -213,21 +196,22 @@ Public Class Book
         If finish_date Is Nothing Then
             Return "-"
         Else
-            Return Format(finish_date, "d.M .yyyy")
+            Return Format(finish_date, "d.M.yyyy")
         End If
     End Function
     Public Function getCategory() As String
-        Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1)
+        Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1) 'last directory from path
     End Function
+    'Private
     Private Sub assignIdToBook(id As UInteger, path As String)
         'Initilize variables
         Dim file_content As Byte() = My.Computer.FileSystem.ReadAllBytes(path)
         Dim fs As New IO.FileStream(path, IO.FileMode.Open)
         Dim binnary_writer As New IO.BinaryWriter(fs)
-        'Write header
-        binnary_writer.Write({&H25, &HBB, &H12})
-        binnary_writer.Write(id)
-        binnary_writer.Write({&H10})
+        'Write data
+        binnary_writer.Write({&H25, &HBB, &H12}) 'Header
+        binnary_writer.Write(id) 'Id
+        binnary_writer.Write({&H10}) 'ending
         'Write content
         binnary_writer.Write(file_content)
         'Close file
@@ -237,9 +221,11 @@ Public Class Book
         'Get highest value
         Dim maxId As UInteger = doc.Root.Element("HighestId").Value
         'Check for overflow
-        'If b_id(0) = &HFF And b_id(1) = &HFF And b_id(2) = &HFF And b_id(3) = &HFF Then
-
-        'End If
+        If BitConverter.GetBytes(maxId).SequenceEqual({&HFF, &HFF, &HFF, &HFF}) Then
+            MessageBox.Show("Maximum id limit reached")
+            Application.Exit()
+        End If
+        'rise id
         maxId += 1
         'check validity
         Dim b_id As Byte() = BitConverter.GetBytes(maxId)
@@ -255,32 +241,35 @@ Public Class Book
         If b_id(3) = &H10 Then
             b_id(3) += 1
         End If
-
-
-        doc.Root.Element("HighestId").Value = BitConverter.ToUInt32(b_id, 0) ' save new highest id
+        'save new highest id
+        doc.Root.Element("HighestId").Value = BitConverter.ToUInt32(b_id, 0)
         Return b_id
     End Function
-    Private Sub loadBookData(path As String)
+    Private Sub loadDataFromBook(path As String)
+        'init
         Dim doc As New PdfDocument()
         doc.LoadFromFile(path)
-
         Dim fileName As String = System.IO.Path.GetFileName(path)
+        'set data
         Me.l_title = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
         Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length - 5) '4 from '.pdf' 1 for beggining
-        'Me.l_begin_date = Nothing
-        'Me.l_finish_date = Nothing
-        'Me.l_notes = ""
-        Me.l_description = "" 'doc.Pages.Item(0). TODO
-        'Me.l_page = 0
+
+        Me.l_description = ""
+        'Dim cnt As Integer = doc.Pages.Count
+        'If cnt > 20 Then cnt = 20
+        'For i As Integer = 0 To 20
+        '    If doc.Pages.Item(i).ExtractText().ToLower.Contains("introduction") Then
+        '        Me.l_description = doc.Pages(i).ExtractText()
+        '        Exit For
+        '    End If
+        'Next
+
         Me.l_pages = doc.Pages.Count()
         Me.l_path = path
-        'Me.l_rating = 0
-        'Me.l_status = 0
         Me.l_image = doc.SaveAsImage(0)
     End Sub
-
-    Private Sub loadBookDataOff(doc As XDocument)
-        'add new book to container
+    Private Sub loadDataFromContainer(doc As XDocument)
+        'add new book to container if not exists
         If doc.Root.Element("Books").Element("ID" & id) Is Nothing Then
             doc.Root.Element("Books").Add(New XElement("ID" & id,
                 New XElement("BeginDate", "-"),
