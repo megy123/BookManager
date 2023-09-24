@@ -171,6 +171,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\agenda.ico" />
+    <Content Include="Resources\agenda.png" />
     <Content Include="Resources\folder_icon.png" />
     <Content Include="info.txt" />
   </ItemGroup>

@@ -205,15 +205,18 @@ Public Class User
     'Private methods
     Private Function getAllFiles(path As String) As List(Of String)
         Dim files As New List(Of String)
-        For Each f As String In IO.Directory.GetFiles(path)
-            If f.EndsWith(".pdf") Then
-                files.Add(f)
-            End If
-        Next
-        For Each d As String In IO.Directory.GetDirectories(path)
-            files.AddRange(getAllFiles(d))
-        Next
-
+        If IO.Directory.Exists(path) Then
+            For Each f As String In IO.Directory.GetFiles(path)
+                If f.EndsWith(".pdf") Then
+                    files.Add(f)
+                End If
+            Next
+            For Each d As String In IO.Directory.GetDirectories(path)
+                files.AddRange(getAllFiles(d))
+            Next
+        Else
+            MessageBox.Show("Non valid library path:""" & path & """.")
+        End If
         Return files
     End Function
     Private Function getDataContainer() As XDocument

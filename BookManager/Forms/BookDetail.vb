@@ -81,6 +81,7 @@
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         'open in folder button
         Process.Start(IO.Path.GetDirectoryName(book.path))
+        'Process.Start("explorer.exe", "/select," & """" & IO.Path.GetDirectoryName(book.path) & """")
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -125,6 +126,10 @@
 
     Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
         book.notes = RichTextBox1.Text
+    End Sub
+
+    Private Sub BookDetail_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        MainForm.guiInit()
     End Sub
 #End Region
 

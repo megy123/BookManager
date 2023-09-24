@@ -31,9 +31,9 @@
         fd.Description = "Change library path."
         If fd.ShowDialog() = DialogResult.OK Then
             user.lib_path = fd.SelectedPath
-            'TODO resetuj usera
+            Application.Restart() 'restart
         End If
-        Label1.Text = "Library path: " & user.lib_path
+        'Label1.Text = "Library path: " & user.lib_path
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -53,7 +53,7 @@
         fd.InitialDirectory = user.lib_path
         If fd.ShowDialog() = DialogResult.OK Then
             IO.File.Copy(fd.FileName, "DataContainer.xml")
-            'TODO resetuj usera
+            Application.Restart() 'restart
         End If
     End Sub
 

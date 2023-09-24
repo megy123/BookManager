@@ -16,21 +16,20 @@
     End Sub
 
     Private Sub bookSelectionChange(isBook As Boolean)
-        If isBook = False Then
-            GroupBox2.Enabled = False
-            Label9.Text = "Title:"
-            Label10.Text = "Author:"
-            Label11.Text = "Satus:"
-
-        Else
+        If isBook = True And selectedBook IsNot Nothing Then
             GroupBox2.Enabled = True
             Label9.Text = "Title: " & selectedBook.title
             Label10.Text = "Author: " & selectedBook.autor
             Label11.Text = "Satus: " & [Enum].GetName(GetType(status), selectedBook.status)
+        ElseIf isBook = False Then
+            GroupBox2.Enabled = False
+                Label9.Text = "Title:"
+                Label10.Text = "Author:"
+            Label11.Text = "Satus:"
         End If
     End Sub
 
-    Private Sub guiInit()
+    Public Sub guiInit()
         'display data
         If user.last_read Is Nothing Then
             Label7.Text = "You have never ever read."
@@ -48,6 +47,8 @@
         Label6.Text = "Read pages: " & user.GetPageCount()
 
         'Setup tree view
+        TreeView1.Nodes.Clear()
+        TreeView1.Nodes.Add("Root", "Bookshelf", 0)
         For Each b As Book In user.books
             Dim path As String = b.path.Substring(user.lib_path.Length + 1)
             Dim node As TreeNode = TreeView1.Nodes.Find("Root", False)(0)
@@ -87,16 +88,17 @@
 
         'Handlers
         AddHandler user.favouriteChanged, AddressOf favouriteChanged
-        AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
-        'Search box setup
-        searchBox = New ListBox()
-        Me.Controls.Add(searchBox)
-        searchBox.Hide()
-        searchBox.BringToFront()
-        searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
-        searchBox.Size = New Size(TextBox1.Size.Width, 1000)
+            AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
+            'Search box setup
+            searchBox = New ListBox()
+            Me.Controls.Add(searchBox)
+            searchBox.Hide()
+            searchBox.BringToFront()
+            searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
+            searchBox.Size = New Size(TextBox1.Size.Width, 1000)
 
-        guiInit()
+            guiInit()
+
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
@@ -145,7 +147,7 @@
         If TextBox1.Text = "" Then
             searchBox.Hide()
         Else
-            Dim searchedBooks As List(Of Book) = user.searchBookByTitle(TextBox1.Text)
+            Dim searchedBooks As List(Of Book) = user.searchBooksByTitle(TextBox1.Text)
             If searchedBooks.Count = 0 Then
                 searchBox.Hide()
             Else
@@ -176,6 +178,9 @@
             If searchBox.SelectedIndex > 0 Then
                 searchBox.SelectedIndex -= 1
             End If
+        ElseIf e.KeyCode = Keys.Enter Then
+            TextBox1.Text = ""
+            searchBox.Items.Clear()
         End If
     End Sub
 

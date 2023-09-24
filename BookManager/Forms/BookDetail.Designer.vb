@@ -22,6 +22,7 @@ Partial Class BookDetail
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(BookDetail))
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -63,7 +64,7 @@ Partial Class BookDetail
         Me.Label1.Location = New System.Drawing.Point(12, 321)
         Me.Label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(56, 20)
+        Me.Label1.Size = New System.Drawing.Size(67, 25)
         Me.Label1.TabIndex = 1
         Me.Label1.Text = "Rating"
         '
@@ -74,7 +75,7 @@ Partial Class BookDetail
         Me.Label2.Location = New System.Drawing.Point(12, 387)
         Me.Label2.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(56, 20)
+        Me.Label2.Size = New System.Drawing.Size(68, 25)
         Me.Label2.TabIndex = 2
         Me.Label2.Text = "Status"
         '
@@ -85,7 +86,7 @@ Partial Class BookDetail
         Me.Label3.Location = New System.Drawing.Point(12, 453)
         Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(54, 20)
+        Me.Label3.Size = New System.Drawing.Size(68, 25)
         Me.Label3.TabIndex = 3
         Me.Label3.Text = "Pages"
         '
@@ -96,7 +97,7 @@ Partial Class BookDetail
         Me.Label4.Location = New System.Drawing.Point(263, 16)
         Me.Label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(79, 33)
+        Me.Label4.Size = New System.Drawing.Size(98, 42)
         Me.Label4.TabIndex = 4
         Me.Label4.Text = "Title:"
         '
@@ -107,7 +108,7 @@ Partial Class BookDetail
         Me.Label5.Location = New System.Drawing.Point(264, 58)
         Me.Label5.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(61, 20)
+        Me.Label5.Size = New System.Drawing.Size(76, 25)
         Me.Label5.TabIndex = 5
         Me.Label5.Text = "Author:"
         '
@@ -118,7 +119,7 @@ Partial Class BookDetail
         Me.Label6.Location = New System.Drawing.Point(263, 82)
         Me.Label6.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(77, 20)
+        Me.Label6.Size = New System.Drawing.Size(98, 25)
         Me.Label6.TabIndex = 6
         Me.Label6.Text = "Category:"
         '
@@ -129,7 +130,7 @@ Partial Class BookDetail
         Me.Label7.Location = New System.Drawing.Point(265, 112)
         Me.Label7.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(72, 16)
+        Me.Label7.Size = New System.Drawing.Size(91, 20)
         Me.Label7.TabIndex = 7
         Me.Label7.Text = "Started on:"
         '
@@ -140,7 +141,7 @@ Partial Class BookDetail
         Me.Label8.Location = New System.Drawing.Point(265, 138)
         Me.Label8.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(95, 16)
+        Me.Label8.Size = New System.Drawing.Size(117, 20)
         Me.Label8.TabIndex = 8
         Me.Label8.Text = "Completed on:"
         '
@@ -151,7 +152,7 @@ Partial Class BookDetail
         Me.ComboBox1.Location = New System.Drawing.Point(16, 345)
         Me.ComboBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.ComboBox1.Name = "ComboBox1"
-        Me.ComboBox1.Size = New System.Drawing.Size(232, 28)
+        Me.ComboBox1.Size = New System.Drawing.Size(232, 33)
         Me.ComboBox1.TabIndex = 10
         '
         'ComboBox2
@@ -161,7 +162,7 @@ Partial Class BookDetail
         Me.ComboBox2.Location = New System.Drawing.Point(16, 411)
         Me.ComboBox2.Margin = New System.Windows.Forms.Padding(4)
         Me.ComboBox2.Name = "ComboBox2"
-        Me.ComboBox2.Size = New System.Drawing.Size(232, 28)
+        Me.ComboBox2.Size = New System.Drawing.Size(232, 33)
         Me.ComboBox2.TabIndex = 11
         '
         'NumericUpDown1
@@ -170,7 +171,7 @@ Partial Class BookDetail
         Me.NumericUpDown1.Location = New System.Drawing.Point(16, 480)
         Me.NumericUpDown1.Margin = New System.Windows.Forms.Padding(4)
         Me.NumericUpDown1.Name = "NumericUpDown1"
-        Me.NumericUpDown1.Size = New System.Drawing.Size(80, 26)
+        Me.NumericUpDown1.Size = New System.Drawing.Size(80, 30)
         Me.NumericUpDown1.TabIndex = 12
         '
         'Label10
@@ -180,7 +181,7 @@ Partial Class BookDetail
         Me.Label10.Location = New System.Drawing.Point(104, 482)
         Me.Label10.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(22, 20)
+        Me.Label10.Size = New System.Drawing.Size(29, 25)
         Me.Label10.TabIndex = 13
         Me.Label10.Text = "/0"
         '
@@ -247,7 +248,7 @@ Partial Class BookDetail
         '
         'BookDetail
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1067, 524)
         Me.Controls.Add(Me.RichTextBox2)
@@ -270,7 +271,10 @@ Partial Class BookDetail
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.PictureBox1)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(238, Byte))
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(4)
+        Me.MaximumSize = New System.Drawing.Size(1085, 571)
+        Me.MinimumSize = New System.Drawing.Size(1085, 571)
         Me.Name = "BookDetail"
         Me.Text = "Book Detail"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
