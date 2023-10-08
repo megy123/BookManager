@@ -45,7 +45,7 @@
         RichTextBox1.Text = book.notes
         ProgressBar1.Maximum = book.pages
         ProgressBar1.Value = book.page
-        PictureBox1.Image = book.image
+        PictureBox1.Image = book.getImage()
         NumericUpDown1.Maximum = book.pages
         NumericUpDown1.Value = book.page
         Label10.Text = "/" & book.pages

@@ -6,9 +6,11 @@
 #Region "Methods"
     Private Sub favouriteChanged()
         ListBox1.Items.Clear()
-        For Each b As Book In user.favourite
-            ListBox1.Items.Add(b.title)
-        Next
+        If user.favourite IsNot Nothing Then
+            For Each b As Book In user.favourite
+                ListBox1.Items.Add(b.title)
+            Next
+        End If
     End Sub
 
     Private Sub lastReadUpdated()
@@ -37,9 +39,9 @@
             Label7.Text = "You read lately on " & Format(user.last_read, "d. MMMM yyyy") & "."
         End If
 
-        For Each b As Book In user.favourite
-            ListBox1.Items.Add(b.title)
-        Next
+        'For Each b As Book In user.favourite
+        '    ListBox1.Items.Add(b.title)
+        'Next
         Label2.Text = "Completed: " & user.GetCompleted()
         Label3.Text = "Reading: " & user.GetReading()
         Label4.Text = "Book count: " & user.GetBookCount()
@@ -47,8 +49,11 @@
         Label6.Text = "Read pages: " & user.GetPageCount()
 
         'Setup tree view
-        TreeView1.Nodes.Clear()
-        TreeView1.Nodes.Add("Root", "Bookshelf", 0)
+        Invoke(Sub()
+                   TreeView1.Nodes.Clear()
+                   TreeView1.Nodes.Add("Root", "Bookshelf", 0)
+               End Sub)
+
         For Each b As Book In user.books
             Dim path As String = b.path.Substring(user.lib_path.Length + 1)
             Dim node As TreeNode = TreeView1.Nodes.Find("Root", False)(0)
@@ -57,47 +62,100 @@
                 Dim i As Integer = path.Count(Function(c As Char) c = "\")
                 For c As Integer = 0 To i - 1
                     If node.Nodes.Find(path.Split("\")(c), False).Length = 0 Then
-                        node = node.Nodes.Add(path.Split("\")(c), path.Split("\")(c))
-                        node.ImageIndex = 0 ' folder image
+                        Invoke(Sub()
+                                   node = node.Nodes.Add(path.Split("\")(c), path.Split("\")(c))
+                                   node.ImageIndex = 0 ' folder image
+                               End Sub)
 
                     Else
-                        node = node.Nodes.Find(path.Split("\")(c), False)(0)
+                        Invoke(Sub() node = node.Nodes.Find(path.Split("\")(c), False)(0))
                     End If
                 Next
             End If
 
-            node = node.Nodes.Add(b.title)
-            'add image
-            ImageList1.Images.Add(b.image)
-            node.ImageIndex = ImageList1.Images.Count - 1
-            node.SelectedImageIndex = ImageList1.Images.Count - 1
+            Invoke(Sub()
+                       node = node.Nodes.Add(b.title)
+                       'add image
+                       'ImageList1.Images.Add(b.image)
+                       node.ImageIndex = 1 'ImageList1.Images.Count - 1
+                       node.SelectedImageIndex = ImageList1.Images.Count - 1
+                   End Sub)
 
         Next
 
-        TreeView1.ExpandAll()
+        'TreeView1.ExpandAll()
+        TreeView1.Nodes.Find("Root", False)(0).Expand()
         bookSelectionChange(False)
         favouriteChanged()
         Label1.Text = "Status: Up to date"
     End Sub
 
+    Private Sub bookLoaded()
+        If user.getLoadedBooks().Split("/")(0) = user.getLoadedBooks().Split("/")(1) Then
+            Label1.Text = "Status: Up to date"
+            guiInit()
+        Else
+            Label1.Text = "Loading books:" & user.getLoadedBooks()
+        End If
+
+        'add book to treeview
+        Dim path As String = user.books(user.books.Count - 1).path.Substring(user.lib_path.Length + 1)
+        Dim node As TreeNode = TreeView1.Nodes.Find("Root", False)(0)
+
+        If path.Contains("\") Then
+            Dim i As Integer = path.Count(Function(c As Char) c = "\")
+            For c As Integer = 0 To i - 1
+                If node.Nodes.Find(path.Split("\")(c), False).Length = 0 Then
+                    Me.Invoke(Sub()
+                                  node = node.Nodes.Add(path.Split("\")(c), path.Split("\")(c))
+                                  node.ImageIndex = 0 ' folder image
+                              End Sub)
+
+                Else
+                    node = node.Nodes.Find(path.Split("\")(c), False)(0)
+                End If
+            Next
+        End If
+
+        Me.Invoke(Sub()
+                      node = node.Nodes.Add(user.books(user.books.Count - 1).title)
+
+                      'add image
+                      'ImageList1.Images.Add(b.image)
+                      node.ImageIndex = 1 'ImageList1.Images.Count - 1
+                      node.SelectedImageIndex = ImageList1.Images.Count - 1
+                  End Sub)
+
+    End Sub
+
 #End Region
 #Region "Controls"
+    Public Sub New()
+        Me.CheckForIllegalCrossThreadCalls = False
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+    End Sub
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         selectedBook = Nothing
         user = New User()
 
         'Handlers
+        AddHandler user.bookLoad, AddressOf bookLoaded
         AddHandler user.favouriteChanged, AddressOf favouriteChanged
-            AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
-            'Search box setup
-            searchBox = New ListBox()
-            Me.Controls.Add(searchBox)
-            searchBox.Hide()
-            searchBox.BringToFront()
-            searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
-            searchBox.Size = New Size(TextBox1.Size.Width, 1000)
+        AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
+        'Search box setup
+        searchBox = New ListBox()
+        Me.Controls.Add(searchBox)
+        searchBox.Hide()
+        searchBox.BringToFront()
+        searchBox.Location = New Point(TextBox1.Location.X, TextBox1.Location.Y + TextBox1.Size.Height)
+        searchBox.Size = New Size(TextBox1.Size.Width, 1000)
 
-            guiInit()
+        guiInit()
 
     End Sub
 
@@ -187,7 +245,6 @@
     Private Sub TextBox1_Leave(sender As Object, e As EventArgs) Handles TextBox1.Leave
         searchBox.Hide()
     End Sub
-
 
 #End Region
 End Class

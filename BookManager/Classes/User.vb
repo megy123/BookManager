@@ -1,7 +1,11 @@
-﻿Imports System.Xml
+﻿Imports System.ComponentModel
+Imports System.Reflection.Emit
+Imports System.Threading
+Imports System.Xml
 Public Class User
     Public Event favouriteChanged()
     Public Event lastReadUpdated()
+    Public Event bookLoad()
 
     Dim l_last_sync As Date?
     Dim l_last_read As Date?
@@ -11,14 +15,18 @@ Public Class User
     Dim l_favourite As List(Of Book)
     Dim l_books As List(Of Book)
 
+    Dim l_booksCount As Integer
+    Dim l_lbooks As Integer
 
 
 #Region "Constructors"
     Public Sub New()
+        AddHandler bookLoad, AddressOf BooksLoaded
         Dim container As XDocument = getDataContainer()
         loadUserData(container)
-        loadUserBooks(container)
-        loadUserFavouriteBooks(container)
+        Dim tThread1 As New Thread(Sub() loadUserBooks(container))
+        tThread1.Start()
+        'loadUserFavouriteBooks(container) <-- toto je v BooksLoaded() funkcii
     End Sub
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
         Me.l_last_sync = l_last_sync
@@ -202,6 +210,9 @@ Public Class User
         Next
         Return False
     End Function
+    Public Function getLoadedBooks() As String
+        Return l_lbooks & "/" & l_booksCount
+    End Function
     'Private methods
     Private Function getAllFiles(path As String) As List(Of String)
         Dim files As New List(Of String)
@@ -260,17 +271,23 @@ Public Class User
         startup_sync = doc.Root.Element("StartupSynchronization").Value
         confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
         lib_path = doc.Root.Element("LibraryPath").Value
+        l_booksCount = 0
+        l_lbooks = 0
     End Sub
     Private Sub loadUserBooks(doc As XDocument)
+
         books = New List(Of Book)
 
         Dim local_books As List(Of String)
         local_books = getAllFiles(lib_path)
+        l_booksCount = local_books.Count
 
         For Each s As String In local_books
             Dim b As New Book(s, doc)
             AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
             books.Add(b)
+            l_lbooks += 1
+            RaiseEvent bookLoad()
         Next
     End Sub
     Private Sub loadUserFavouriteBooks(doc As XDocument)
@@ -286,5 +303,12 @@ Public Class User
         last_read = My.Computer.Clock.LocalTime
         RaiseEvent lastReadUpdated()
     End Sub 'Handler function
+
+    Private Sub BooksLoaded()
+        If getLoadedBooks().Split("/")(0) = getLoadedBooks().Split("/")(1) Then
+            Dim container As XDocument = getDataContainer()
+            loadUserFavouriteBooks(container)
+        End If
+    End Sub
 #End Region
 End Class

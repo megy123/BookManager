@@ -202,6 +202,11 @@ Public Class Book
     Public Function getCategory() As String
         Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1) 'last directory from path
     End Function
+    Public Function getImage() As Image
+        Dim doc As New PdfDocument()
+        doc.LoadFromFile(path)
+        Return doc.SaveAsImage(0)
+    End Function
     'Private
     Private Sub assignIdToBook(id As UInteger, path As String)
         'Initilize variables
@@ -247,26 +252,43 @@ Public Class Book
     End Function
     Private Sub loadDataFromBook(path As String)
         'init
-        Dim doc As New PdfDocument()
-        doc.LoadFromFile(path)
-        Dim fileName As String = System.IO.Path.GetFileName(path)
-        'set data
-        Me.l_title = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
-        Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length - 5) '4 from '.pdf' 1 for beggining
+        Try
+            PdfDocument.ClearCustomFontsFolders()
+            Dim doc As New PdfDocument()
+            doc.LoadFromFile(path)
 
-        Me.l_description = ""
-        'Dim cnt As Integer = doc.Pages.Count
-        'If cnt > 20 Then cnt = 20
-        'For i As Integer = 0 To 20
-        '    If doc.Pages.Item(i).ExtractText().ToLower.Contains("introduction") Then
-        '        Me.l_description = doc.Pages(i).ExtractText()
-        '        Exit For
-        '    End If
-        'Next
+            Me.l_path = path
+            Dim fileName As String = System.IO.Path.GetFileName(path)
+            'set data
+            If fileName.Count(Function(c As Char) c = "-") = 1 Then
+                Me.l_title = fileName.Split("-")(0).Substring(0, fileName.Split("-")(0).Length - 1)
+                Me.l_autor = fileName.Split("-")(1).Substring(1, fileName.Split("-")(1).Length - 5) '4 from '.pdf' 1 for beggining
+            Else
+                Me.l_title = fileName.Substring(1, fileName.Length - 5) '4 from '.pdf' 1 for beggining
+                Me.l_autor = ""
+            End If
 
-        Me.l_pages = doc.Pages.Count()
-        Me.l_path = path
-        Me.l_image = doc.SaveAsImage(0)
+            Me.l_description = ""
+            'Dim cnt As Integer = doc.Pages.Count
+            'If cnt > 20 Then cnt = 20
+            'For i As Integer = 0 To 20
+            '    If doc.Pages.Item(i).ExtractText().ToLower.Contains("introduction") Then
+            '        Me.l_description = doc.Pages(i).ExtractText()
+            '        Exit For
+            '    End If
+            'Next
+
+            Me.l_pages = doc.Pages.Count()
+
+            'Me.l_image = doc.SaveAsImage(0, 10, 10)
+            doc.Close()
+            doc.Dispose()
+        Catch ex As Exception
+
+            MessageBox.Show(path & ex.Message)
+        End Try
+
+
     End Sub
     Private Sub loadDataFromContainer(doc As XDocument)
         'add new book to container if not exists
