@@ -59,3 +59,14 @@ TODO:
 -Search
 -Settings
 -Favourite
+
+
+Systém identifikácie kníh:
+-v tomto dočasnom riešení bude rišesný pomocou názvu PDF
+-pri otvorení aplikácie sa načítajú všetky knihy ak bude nejaký rozdiel medzi konfiguráciu a načítanými
+knihami vyskočí dialogove okno
+-v okne budú 2 možnosti OK: (defaultna) nové knihy pridá, chýbajúce knihy odstráni
+						Select: manuálne vybere čo sa má s knihami urobiť
+								pridať
+								odstrániť
+								nahradiť chýbajúcu knihu novou (poprípade chýbajúcu knihu exisutjúcou)

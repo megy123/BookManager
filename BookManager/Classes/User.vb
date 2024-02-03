@@ -144,7 +144,7 @@ Public Class User
         favourite.Add(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id))
+        container.Root.Element("FavouriteBooks").Add(New XElement(b.id))
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
@@ -153,7 +153,7 @@ Public Class User
         favourite.Remove(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Element("ID" & b.id).Remove()
+        container.Root.Element("FavouriteBooks").Element(b.id).Remove()
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
