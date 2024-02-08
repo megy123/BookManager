@@ -24,6 +24,10 @@ Public Class User
         AddHandler bookLoad, AddressOf BooksLoaded
         Dim container As XDocument = getDataContainer()
         loadUserData(container)
+        If lib_path = "" Then 'set library path to default
+            lib_path = My.Application.Info.DirectoryPath
+        End If
+
         Dim tThread1 As New Thread(Sub() loadUserBooks(container))
         tThread1.Start()
         'loadUserFavouriteBooks(container) <-- toto je v BooksLoaded() funkcii
@@ -197,7 +201,7 @@ Public Class User
         Next
         Return Nothing
     End Function
-    Public Function getBookById(id As Integer) As Book
+    Public Function getBookById(id As String) As Book
         'wiederholen
         For Each b As Book In books
             If b.id = id Then Return b
@@ -275,6 +279,12 @@ Public Class User
         l_lbooks = 0
     End Sub
     Private Sub loadUserBooks(doc As XDocument)
+        Dim prevBooks As New List(Of String)
+        Dim newBooks As New List(Of String)
+
+        For Each el As XElement In doc.Root.Element("Books").Elements
+            prevBooks.Add(el.Name.LocalName)
+        Next
 
         books = New List(Of Book)
 
@@ -283,17 +293,59 @@ Public Class User
         l_booksCount = local_books.Count
 
         For Each s As String In local_books
+            newBooks.Add(IO.Path.GetFileName(s).Replace(" ", "_").Replace(",", "_"))
             Dim b As New Book(s, doc)
             AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
             books.Add(b)
             l_lbooks += 1
             RaiseEvent bookLoad()
         Next
+
+
+        'get all books
+        Dim allBooksCnt As Integer = newBooks.Count
+
+        'get new books
+        Dim newBooksCnt As Integer = 0
+        Dim addedBooks As New List(Of String)
+        For Each s As String In newBooks
+            If Not prevBooks.ToArray().Contains(s) Then
+                newBooksCnt += 1
+                addedBooks.Add(s)
+            End If
+        Next
+
+        'get removed books
+        Dim removedBooksCnt As Integer = 0
+        Dim removedBooks As New List(Of String)
+        For Each s As String In prevBooks
+            If Not newBooks.ToArray().Contains(s) Then
+                removedBooksCnt += 1
+                removedBooks.Add(s)
+            End If
+        Next
+
+
+        'MessageBox.Show("old book:" & prevBooks(0) & vbCrLf & "new book:" & newBooks(0))
+        If newBooksCnt Or removedBooksCnt Then
+            Dim syncDialog As New Syncing(allBooksCnt, newBooksCnt, removedBooksCnt)
+            If syncDialog.ShowDialog() = DialogResult.OK Then
+
+            Else
+
+            End If
+
+            'remove missing books
+            For Each title As String In removedBooks
+                RemoveBook(doc, title)
+            Next
+        End If
+
     End Sub
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
         For Each fb As XElement In doc.Root.Element("FavouriteBooks").Elements
-            Dim book As Book = getBookById(Integer.Parse(fb.Name.LocalName.Substring(2)))
+            Dim book As Book = getBookById(fb.Name.LocalName)
             If Not IsNothing(book) Then
                 favourite.Add(book)
             End If
@@ -308,6 +360,18 @@ Public Class User
         If getLoadedBooks().Split("/")(0) = getLoadedBooks().Split("/")(1) Then
             Dim container As XDocument = getDataContainer()
             loadUserFavouriteBooks(container)
+        End If
+    End Sub
+
+    Private Sub RemoveBook(doc As XDocument, bookTitle As String)
+        'remove book from container
+        My.Computer.FileSystem.WriteAllText("deletedBooks.log", doc.Root.Element("Books").Element(bookTitle).ToString(), True)
+        doc.Root.Element("Books").Element(bookTitle).Remove()
+        doc.Save("DataContainer.xml")
+
+        'remove from favourites
+        If doc.Root.Element("FavouriteBooks").Element(bookTitle) IsNot Nothing Then
+            doc.Root.Element("FavouriteBooks").Element(bookTitle).Remove()
         End If
     End Sub
 #End Region

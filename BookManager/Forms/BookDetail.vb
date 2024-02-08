@@ -92,7 +92,7 @@
     Private Sub ComboBox2_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox2.SelectedIndexChanged
         'Status combobox
         book.status = ComboBox2.SelectedIndex
-        If ComboBox2.SelectedIndex = status.Reading Then
+        If ComboBox2.SelectedIndex = status.Reading Or ComboBox2.SelectedIndex = status.Completed Then
             ReadBookGuiChange(True)
         Else
             ReadBookGuiChange(False)
@@ -131,6 +131,7 @@
     Private Sub BookDetail_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         MainForm.guiInit()
     End Sub
+
 #End Region
 
 End Class

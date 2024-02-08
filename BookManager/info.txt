@@ -70,3 +70,7 @@ knihami vyskočí dialogove okno
 								pridať
 								odstrániť
 								nahradiť chýbajúcu knihu novou (poprípade chýbajúcu knihu exisutjúcou)
+
+
+Typy:
+-nedala by sa synchronizácia urobiť cez assync ?
