@@ -271,6 +271,9 @@ Public Class User
         startup_sync = doc.Root.Element("StartupSynchronization").Value
         confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
         lib_path = doc.Root.Element("LibraryPath").Value
+        If Not System.IO.Directory.Exists(lib_path) Then
+            lib_path = My.Application.Info.DirectoryPath
+        End If
         l_booksCount = 0
         l_lbooks = 0
     End Sub
@@ -279,6 +282,7 @@ Public Class User
         books = New List(Of Book)
 
         Dim local_books As List(Of String)
+
         local_books = getAllFiles(lib_path)
         l_booksCount = local_books.Count
 
@@ -289,6 +293,7 @@ Public Class User
             l_lbooks += 1
             RaiseEvent bookLoad()
         Next
+
     End Sub
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
