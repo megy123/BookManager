@@ -1,4 +1,4 @@
-﻿Requirements v.1 :
+﻿Requirements v.1.0 :
 -prehľad všetkých kníh v zložke
 -detail knihy a informácie(názov, autor, náhľadový obrázok, popis knihy, poznámky, počet stán, aktuálna strana,(kapitoly))
 -ukladanie a načítavanie informácií zo súboru
@@ -59,3 +59,9 @@ TODO:
 -Search
 -Settings
 -Favourite
+
+V.1.1
+
+-kvalitná lokálna synchronizácia
+-šifrovanie dát
+-synchronizovanie so vzdialeným serverom
