@@ -131,6 +131,7 @@
     Private Sub BookDetail_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         MainForm.guiInit()
     End Sub
+
 #End Region
 
 End Class

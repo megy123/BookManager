@@ -144,7 +144,7 @@ Public Class User
         favourite.Add(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id))
+        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id.ToString()))
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
@@ -153,7 +153,7 @@ Public Class User
         favourite.Remove(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Element("ID" & b.id).Remove()
+        container.Root.Element("FavouriteBooks").Element("ID" & b.id.ToString()).Remove()
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
@@ -200,7 +200,7 @@ Public Class User
     Public Function getBookById(id As Integer) As Book
         'wiederholen
         For Each b As Book In books
-            If b.id = id Then Return b
+            If b.id.ToString() = id Then Return b
         Next
         Return Nothing
     End Function
@@ -243,7 +243,6 @@ Public Class User
                     New XElement("StartupSynchronization", True),
                     New XElement("ConfirmSynchronization", False),
                     New XElement("LibraryPath", ""),
-                    New XElement("HighestId", 0),
                     New XComment("User books."),
                     New XElement("Books"),
                     New XComment("User favourite books."),
@@ -278,7 +277,6 @@ Public Class User
         l_lbooks = 0
     End Sub
     Private Sub loadUserBooks(doc As XDocument)
-
         books = New List(Of Book)
 
         Dim local_books As List(Of String)
