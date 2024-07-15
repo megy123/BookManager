@@ -8,7 +8,7 @@ Public Class Form1
     Dim folder_path As String
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
-            doc = PdfReader.Open(OpenFileDialog1.FileName)
+            doc = PdfReader.Open(OpenFileDialog1.FileName, PdfDocumentOpenMode.Modify)
             path = OpenFileDialog1.FileName
         End If
     End Sub

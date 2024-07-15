@@ -6,6 +6,7 @@ Public Class User
     Public Event favouriteChanged()
     Public Event lastReadUpdated()
     Public Event bookLoad()
+    Public Event failedLoadAllBooks(books As List(Of String))
 
     Dim l_last_sync As Date?
     Dim l_last_read As Date?
@@ -21,12 +22,7 @@ Public Class User
 
 #Region "Constructors"
     Public Sub New()
-        AddHandler bookLoad, AddressOf BooksLoaded
-        Dim container As XDocument = getDataContainer()
-        loadUserData(container)
-        Dim tThread1 As New Thread(Sub() loadUserBooks(container))
-        tThread1.Start()
-        'loadUserFavouriteBooks(container) <-- toto je v BooksLoaded() funkcii
+
     End Sub
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
         Me.l_last_sync = l_last_sync
@@ -126,6 +122,13 @@ Public Class User
 #Region "Methods"
 
     'Public methods
+    Public Sub Load()
+        Dim container As XDocument = getDataContainer()
+        loadUserData(container)
+        Dim tThread1 As New Thread(Sub() loadUserBooks(container))
+        tThread1.Start()
+        'loadUserFavouriteBooks(container) <-- toto je v BooksLoaded() funkcii
+    End Sub
     Public Sub sync()
         last_sync = My.Computer.Clock.LocalTime
     End Sub
@@ -277,6 +280,7 @@ Public Class User
         l_lbooks = 0
     End Sub
     Private Sub loadUserBooks(doc As XDocument)
+        Dim failedLoadedBooks As New List(Of String)
         books = New List(Of Book)
 
         Dim local_books As List(Of String)
@@ -285,13 +289,23 @@ Public Class User
         l_booksCount = local_books.Count
 
         For Each s As String In local_books
-            Dim b As New Book(s, doc)
-            AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
-            books.Add(b)
-            l_lbooks += 1
-            RaiseEvent bookLoad()
+            Try
+                Dim b As New Book(s, doc)
+                AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
+                books.Add(b)
+                l_lbooks += 1
+                RaiseEvent bookLoad()
+            Catch ex As Exception
+                failedLoadedBooks.Add(s & " : " & ex.Message)
+            End Try
         Next
 
+        If failedLoadedBooks.Count > 0 Then
+            RaiseEvent failedLoadAllBooks(failedLoadedBooks)
+        End If
+
+        Dim container As XDocument = getDataContainer()
+        loadUserFavouriteBooks(container)
     End Sub
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
@@ -306,12 +320,5 @@ Public Class User
         last_read = My.Computer.Clock.LocalTime
         RaiseEvent lastReadUpdated()
     End Sub 'Handler function
-
-    Private Sub BooksLoaded()
-        If getLoadedBooks().Split("/")(0) = getLoadedBooks().Split("/")(1) Then
-            Dim container As XDocument = getDataContainer()
-            loadUserFavouriteBooks(container)
-        End If
-    End Sub
 #End Region
 End Class

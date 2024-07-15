@@ -38,13 +38,18 @@ Public Class Book
     End Sub
     Public Sub New(path As String, doc As XDocument)
         'Get pdf book ID
-        Dim bookFile As PdfDocument = PdfReader.Open(path)
-        If bookFile.Info.Elements.Keys.Contains("/bmguid") Then
-            Me.l_id = Guid.Parse(bookFile.Info.Elements.Item("/bmguid").ToString())
+        Dim byteBuffer As Byte() = System.IO.File.ReadAllBytes(path)
+        Dim byteBufferAsString As String = System.Text.Encoding.UTF8.GetString(byteBuffer)
+        Dim offset1 As Int32 = byteBufferAsString.IndexOf("/bmguid")
+
+
+        If Not offset1 = -1 Then
+            'Me.l_id = Guid.Parse(bookFile.Info.Elements.Item("/bmguid").ToString())
         Else
-            Me.l_id = Guid.NewGuid()
-            bookFile.Info.Elements.Add(New KeyValuePair(Of String, PdfItem)("/bmguid", New PdfString(Me.l_id.ToString())))
-            bookFile.Save(path)
+            'Dim bookFile As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
+            'Me.l_id = Guid.NewGuid()
+            'bookFile.Info.Elements.Add(New KeyValuePair(Of String, PdfItem)("/bmguid", New PdfString(Me.l_id.ToString())))
+            'bookFile.Save(path)
         End If
 
         'load book data
@@ -207,7 +212,7 @@ Public Class Book
     Private Sub loadDataFromBook(path As String)
         'init
         Try
-            Dim doc As PdfDocument = PdfReader.Open(path)
+            'Dim doc As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
 
             Me.l_path = path
             Dim fileName As String = System.IO.Path.GetFileName(path)
@@ -230,11 +235,11 @@ Public Class Book
             '    End If
             'Next
 
-            Me.l_pages = doc.Pages.Count()
+            Me.l_pages = 100 'doc.Pages.Count()
 
             'Me.l_image = doc.SaveAsImage(0, 10, 10)
-            doc.Close()
-            doc.Dispose()
+            'doc.Close()
+            'doc.Dispose()
         Catch ex As Exception
 
             MessageBox.Show(path & ex.Message)

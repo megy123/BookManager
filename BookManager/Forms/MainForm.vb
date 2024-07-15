@@ -128,6 +128,15 @@
 
     End Sub
 
+    Private Sub FailedBookLoad(books As List(Of String))
+        Label1.Text = "Status: Up to date"
+
+        Dim le As New LoadErrors(books)
+        If le.ShowDialog() = DialogResult.OK Then
+
+        End If
+    End Sub
+
 #End Region
 #Region "Controls"
     Public Sub New()
@@ -144,9 +153,11 @@
         user = New User()
 
         'Handlers
+        AddHandler user.failedLoadAllBooks, AddressOf FailedBookLoad
         AddHandler user.bookLoad, AddressOf bookLoaded
         AddHandler user.favouriteChanged, AddressOf favouriteChanged
         AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
+        user.Load()
         'Search box setup
         searchBox = New ListBox()
         Me.Controls.Add(searchBox)
