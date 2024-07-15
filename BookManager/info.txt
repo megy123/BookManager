@@ -65,3 +65,10 @@ V.1.1
 -kvalitná lokálna synchronizácia
 -šifrovanie dát
 -synchronizovanie so vzdialeným serverom
+
+Synchronizácia
+
+Problémové javy:
+- nájdenie neevidovanej knihy (bez ID)
+- nájdenie evidovanej knihy (s ID)
+- nenájdenie evidovanej knihy
