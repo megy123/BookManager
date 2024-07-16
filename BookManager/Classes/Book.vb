@@ -1,4 +1,7 @@
-﻿Imports PdfSharp.Drawing
+﻿Imports System.Drawing.Imaging
+Imports System.IO
+Imports System.Xml
+Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
 
@@ -20,6 +23,8 @@ Public Class Book
     Dim l_status As SByte
     Dim l_image As Image
 
+    Private BookXMLName As String
+
 
 #Region "Constructors"
     Public Sub New(l_id As Guid, l_title As String, l_autor As String, l_begin_date As Date, l_finish_date As Date, l_notes As String, l_description As String, l_page As Short, l_pages As Short, l_path As String, l_rating As SByte, l_status As SByte)
@@ -35,25 +40,21 @@ Public Class Book
         Me.l_path = l_path
         Me.l_rating = l_rating
         Me.l_status = l_status
+
+        Dim fileName As String = System.IO.Path.GetFileName(l_path)
+        Me.BookXMLName = "ID" & XmlConvert.EncodeName(fileName)
     End Sub
     Public Sub New(path As String, doc As XDocument)
-        'Get pdf book ID
-        Dim byteBuffer As Byte() = System.IO.File.ReadAllBytes(path)
-        Dim byteBufferAsString As String = System.Text.Encoding.UTF8.GetString(byteBuffer)
-        Dim offset1 As Int32 = byteBufferAsString.IndexOf("/bmguid")
+        Dim fileName As String = System.IO.Path.GetFileName(path)
 
+        Me.BookXMLName = "ID" & XmlConvert.EncodeName(fileName)
 
-        If Not offset1 = -1 Then
-            'Me.l_id = Guid.Parse(bookFile.Info.Elements.Item("/bmguid").ToString())
+        If doc.Root.Element("Books").Element(Me.BookXMLName) IsNot Nothing Then
+            loadDataFromContainer(doc.Root.Element("Books").Element(Me.BookXMLName))
         Else
-            'Dim bookFile As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
-            'Me.l_id = Guid.NewGuid()
-            'bookFile.Info.Elements.Add(New KeyValuePair(Of String, PdfItem)("/bmguid", New PdfString(Me.l_id.ToString())))
-            'bookFile.Save(path)
+            addNewBookToContainer(doc, path)
         End If
 
-        'load book data
-        loadDataFromContainer(doc)
         loadDataFromBook(path)
     End Sub
 
@@ -91,7 +92,7 @@ Public Class Book
         Set(value As Date?)
             l_begin_date = value
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("BeginDate").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("BeginDate").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -102,7 +103,7 @@ Public Class Book
         Set(value As Date?)
             l_finish_date = value
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("FinishDate").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("FinishDate").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -113,7 +114,7 @@ Public Class Book
         Set(value As String)
             l_notes = value
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("Notes").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("Notes").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -133,7 +134,7 @@ Public Class Book
             l_page = value
             RaiseEvent bookRead()
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("Page").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("Page").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -160,7 +161,7 @@ Public Class Book
         Set(value As SByte)
             l_rating = value
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("Rating").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("Rating").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -171,7 +172,7 @@ Public Class Book
         Set(value As SByte)
             l_status = value
             Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element("ID" & Me.l_id.ToString()).Element("Status").Value = value
+            container.Root.Element("Books").Element(Me.BookXMLName).Element("Status").Value = value
             container.Save("DataContainer.xml")
         End Set
     End Property
@@ -206,14 +207,16 @@ Public Class Book
         Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1) 'last directory from path
     End Function
     Public Function getImage() As Image
+        'Select GhostScript lib
+
+        'rasterizer.Open(Me.path, gvi, True)
+        'Return rasterizer.GetPage(320, 0)
         Return Nothing
     End Function
     'Private
     Private Sub loadDataFromBook(path As String)
         'init
         Try
-            'Dim doc As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
-
             Me.l_path = path
             Dim fileName As String = System.IO.Path.GetFileName(path)
             'set data
@@ -226,59 +229,62 @@ Public Class Book
             End If
 
             Me.l_description = ""
-            'Dim cnt As Integer = doc.Pages.Count
-            'If cnt > 20 Then cnt = 20
-            'For i As Integer = 0 To 20
-            '    If doc.Pages.Item(i).ExtractText().ToLower.Contains("introduction") Then
-            '        Me.l_description = doc.Pages(i).ExtractText()
-            '        Exit For
-            '    End If
-            'Next
-
-            Me.l_pages = 100 'doc.Pages.Count()
-
-            'Me.l_image = doc.SaveAsImage(0, 10, 10)
-            'doc.Close()
-            'doc.Dispose()
         Catch ex As Exception
 
             MessageBox.Show(path & ex.Message)
         End Try
-
-
     End Sub
-    Private Sub loadDataFromContainer(doc As XDocument)
+    Private Sub loadDataFromContainer(BookElement As XElement)
+        'load data from container
+        If BookElement.Element("BeginDate").Value = "-" Then
+            l_begin_date = Nothing
+        Else
+            l_begin_date = Convert.ToDateTime(BookElement.Element("BeginDate").Value)
+        End If
+
+        If BookElement.Element("FinishDate").Value = "-" Then
+            l_finish_date = Nothing
+        Else
+            l_finish_date = Convert.ToDateTime(BookElement.Element("FinishDate").Value)
+        End If
+
+        l_page = BookElement.Element("Page").Value
+        l_rating = BookElement.Element("Rating").Value
+        l_status = BookElement.Element("Status").Value
+        l_notes = BookElement.Element("Notes").Value
+        l_id = Guid.Parse(BookElement.Element("BMGUID").Value)
+        l_pages = BookElement.Element("Pages").Value
+    End Sub
+
+    Private Sub addNewBookToContainer(container As XDocument, path As String)
         'add new book to container if not exists
-        If doc.Root.Element("Books").Element("ID" & id.ToString()) Is Nothing Then
-            doc.Root.Element("Books").Add(New XElement("ID" & id.ToString(),
+        Me.l_id = Guid.NewGuid()
+
+        Dim doc As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
+        Me.pages = doc.Pages.Count()
+        doc.Close()
+        doc.Dispose()
+
+        Dim fileName As String = System.IO.Path.GetFileName(path)
+        container.Root.Element("Books").Add(New XElement(Me.BookXMLName,
+                New XElement("BMGUID", Me.l_id),
                 New XElement("BeginDate", "-"),
                 New XElement("FinishDate", "-"),
                 New XElement("Page", 0),
+                New XElement("Pages", Me.l_pages),
                 New XElement("Rating", 0),
                 New XElement("Status", 0),
                 New XElement("Notes", "")
             ))
 
-            doc.Save("DataContainer.xml")
-        End If
+        container.Save("DataContainer.xml")
 
-        'load data from container
-        If doc.Root.Element("Books").Element("ID" & id.ToString()).Element("BeginDate").Value = "-" Then
-            l_begin_date = Nothing
-        Else
-            l_begin_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id.ToString()).Element("BeginDate").Value)
-        End If
-
-        If doc.Root.Element("Books").Element("ID" & id.ToString()).Element("FinishDate").Value = "-" Then
-            l_finish_date = Nothing
-        Else
-            l_finish_date = Convert.ToDateTime(doc.Root.Element("Books").Element("ID" & id.ToString()).Element("FinishDate").Value)
-        End If
-
-        l_page = doc.Root.Element("Books").Element("ID" & id.ToString()).Element("Page").Value
-        l_rating = doc.Root.Element("Books").Element("ID" & id.ToString()).Element("Rating").Value
-        l_status = doc.Root.Element("Books").Element("ID" & id.ToString()).Element("Status").Value
-        l_notes = doc.Root.Element("Books").Element("ID" & id.ToString()).Element("Notes").Value
+        Me.l_begin_date = Nothing
+        Me.l_finish_date = Nothing
+        Me.l_page = 0
+        Me.l_rating = 0
+        Me.l_status = 0
+        Me.l_notes = String.Empty
     End Sub
 #End Region
 End Class
