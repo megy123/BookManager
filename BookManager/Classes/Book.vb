@@ -4,6 +4,8 @@ Imports System.Xml
 Imports PdfSharp.Drawing
 Imports PdfSharp.Pdf
 Imports PdfSharp.Pdf.IO
+Imports Ghostscript.NET
+Imports Ghostscript.NET.Rasterizer
 
 Public Class Book
     Public Event readDateChanged()
@@ -208,6 +210,12 @@ Public Class Book
     End Function
     Public Function getImage() As Image
         'Select GhostScript lib
+
+        Dim rasterizer As GhostscriptRasterizer = New GhostscriptRasterizer()
+        rasterizer.Open(path)
+        Return rasterizer.GetPage(72, 1)
+
+
 
         'rasterizer.Open(Me.path, gvi, True)
         'Return rasterizer.GetPage(320, 0)
