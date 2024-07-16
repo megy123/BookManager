@@ -19,7 +19,6 @@ Public Class User
     Dim l_booksCount As Integer
     Dim l_lbooks As Integer
 
-
 #Region "Constructors"
     Public Sub New()
 
@@ -147,7 +146,7 @@ Public Class User
         favourite.Add(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id.ToString()))
+        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.BookXMLName))
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
@@ -156,7 +155,7 @@ Public Class User
         favourite.Remove(b)
         'save to container
         Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Element("ID" & b.id.ToString()).Remove()
+        container.Root.Element("FavouriteBooks").Element("ID" & b.BookXMLName).Remove()
         container.Save("DataContainer.xml")
 
         RaiseEvent favouriteChanged()
@@ -226,7 +225,7 @@ Public Class User
                 End If
             Next
             For Each d As String In IO.Directory.GetDirectories(path)
-                files.AddRange(getAllFiles(d))
+                files.AddRange(getAllFiles(d)) 'recursive call
             Next
         Else
             MessageBox.Show("Non valid library path:""" & path & """.")
@@ -238,6 +237,7 @@ Public Class User
         If (IO.File.Exists("DataContainer.xml")) Then
             Return XDocument.Load("DataContainer.xml")
         Else
+            'create new container
             Dim doc As New XDocument(
                 New XComment("User data."),
                 New XElement("User",
@@ -273,8 +273,8 @@ Public Class User
         startup_sync = doc.Root.Element("StartupSynchronization").Value
         confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
         lib_path = doc.Root.Element("LibraryPath").Value
-        If Not System.IO.Directory.Exists(lib_path) Then
-            lib_path = My.Application.Info.DirectoryPath
+        If Not System.IO.Directory.Exists(lib_path) Then ' check if valid path
+            lib_path = My.Application.Info.DirectoryPath ' set default path
         End If
         l_booksCount = 0
         l_lbooks = 0
@@ -283,12 +283,13 @@ Public Class User
         Dim failedLoadedBooks As New List(Of String)
         books = New List(Of Book)
 
-        Dim local_books As List(Of String)
 
+        Dim local_books As List(Of String)
         local_books = getAllFiles(lib_path)
         l_booksCount = local_books.Count
 
         For Each s As String In local_books
+            'try to load book
             Try
                 Dim b As New Book(s, doc)
                 AddHandler b.bookRead, AddressOf lastReadUpdatedHandler

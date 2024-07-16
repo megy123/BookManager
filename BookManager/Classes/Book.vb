@@ -25,7 +25,7 @@ Public Class Book
     Dim l_status As SByte
     Dim l_image As Image
 
-    Private BookXMLName As String
+    Public BookXMLName As String
 
 
 #Region "Constructors"
@@ -47,16 +47,16 @@ Public Class Book
         Me.BookXMLName = "ID" & XmlConvert.EncodeName(fileName)
     End Sub
     Public Sub New(path As String, doc As XDocument)
+        'Check if book already in data container
         Dim fileName As String = System.IO.Path.GetFileName(path)
-
         Me.BookXMLName = "ID" & XmlConvert.EncodeName(fileName)
-
         If doc.Root.Element("Books").Element(Me.BookXMLName) IsNot Nothing Then
             loadDataFromContainer(doc.Root.Element("Books").Element(Me.BookXMLName))
         Else
             addNewBookToContainer(doc, path)
         End If
 
+        'load book data
         loadDataFromBook(path)
     End Sub
 
@@ -209,7 +209,7 @@ Public Class Book
         Return path.Split("\")(path.Count(Function(c As Char) c = "\") - 1) 'last directory from path
     End Function
     Public Function getImage() As Image
-        'Select GhostScript lib
+        'Try to get thumbnail
         Try
             Dim rasterizer As GhostscriptRasterizer = New GhostscriptRasterizer()
             rasterizer.Open(path)
@@ -236,61 +236,69 @@ Public Class Book
 
             Me.l_description = ""
         Catch ex As Exception
-
             MessageBox.Show(path & ex.Message)
         End Try
     End Sub
     Private Sub loadDataFromContainer(BookElement As XElement)
         'load data from container
-        If BookElement.Element("BeginDate").Value = "-" Then
-            l_begin_date = Nothing
-        Else
-            l_begin_date = Convert.ToDateTime(BookElement.Element("BeginDate").Value)
-        End If
+        Try
+            If BookElement.Element("BeginDate").Value = "-" Then
+                l_begin_date = Nothing
+            Else
+                l_begin_date = Convert.ToDateTime(BookElement.Element("BeginDate").Value)
+            End If
 
-        If BookElement.Element("FinishDate").Value = "-" Then
-            l_finish_date = Nothing
-        Else
-            l_finish_date = Convert.ToDateTime(BookElement.Element("FinishDate").Value)
-        End If
+            If BookElement.Element("FinishDate").Value = "-" Then
+                l_finish_date = Nothing
+            Else
+                l_finish_date = Convert.ToDateTime(BookElement.Element("FinishDate").Value)
+            End If
 
-        l_page = BookElement.Element("Page").Value
-        l_rating = BookElement.Element("Rating").Value
-        l_status = BookElement.Element("Status").Value
-        l_notes = BookElement.Element("Notes").Value
-        l_id = Guid.Parse(BookElement.Element("BMGUID").Value)
-        l_pages = BookElement.Element("Pages").Value
+            l_page = BookElement.Element("Page").Value
+            l_rating = BookElement.Element("Rating").Value
+            l_status = BookElement.Element("Status").Value
+            l_notes = BookElement.Element("Notes").Value
+            l_id = Guid.Parse(BookElement.Element("BMGUID").Value)
+            l_pages = BookElement.Element("Pages").Value
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
     End Sub
 
     Private Sub addNewBookToContainer(container As XDocument, path As String)
         'add new book to container if not exists
-        Me.l_id = Guid.NewGuid()
+        Try
+            Me.l_id = Guid.NewGuid()
 
-        Dim doc As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
-        Me.pages = doc.Pages.Count()
-        doc.Close()
-        doc.Dispose()
+            Dim doc As PdfDocument = PdfReader.Open(path, PdfDocumentOpenMode.Modify)
+            Me.pages = doc.Pages.Count()
+            doc.Close()
+            doc.Dispose()
 
-        Dim fileName As String = System.IO.Path.GetFileName(path)
-        container.Root.Element("Books").Add(New XElement(Me.BookXMLName,
-                New XElement("BMGUID", Me.l_id),
-                New XElement("BeginDate", "-"),
-                New XElement("FinishDate", "-"),
-                New XElement("Page", 0),
-                New XElement("Pages", Me.l_pages),
-                New XElement("Rating", 0),
-                New XElement("Status", 0),
-                New XElement("Notes", "")
-            ))
+            Dim fileName As String = System.IO.Path.GetFileName(path)
+            container.Root.Element("Books").Add(New XElement(Me.BookXMLName,
+                    New XElement("BMGUID", Me.l_id),
+                    New XElement("BeginDate", "-"),
+                    New XElement("FinishDate", "-"),
+                    New XElement("Page", 0),
+                    New XElement("Pages", Me.l_pages),
+                    New XElement("Rating", 0),
+                    New XElement("Status", 0),
+                    New XElement("Notes", "")
+                ))
 
-        container.Save("DataContainer.xml")
+            container.Save("DataContainer.xml")
 
-        Me.l_begin_date = Nothing
-        Me.l_finish_date = Nothing
-        Me.l_page = 0
-        Me.l_rating = 0
-        Me.l_status = 0
-        Me.l_notes = String.Empty
+            'set properties to default
+            Me.l_begin_date = Nothing
+            Me.l_finish_date = Nothing
+            Me.l_page = 0
+            Me.l_rating = 0
+            Me.l_status = 0
+            Me.l_notes = String.Empty
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
     End Sub
 #End Region
 End Class
