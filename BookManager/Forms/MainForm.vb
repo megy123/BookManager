@@ -61,14 +61,15 @@
             If path.Contains("\") Then
                 Dim i As Integer = path.Count(Function(c As Char) c = "\")
                 For c As Integer = 0 To i - 1
-                    If node.Nodes.Find(path.Split("\")(c), False).Length = 0 Then
+                    Dim index As Integer = c
+                    If node.Nodes.Find(path.Split("\")(index), False).Length = 0 Then
                         Invoke(Sub()
-                                   node = node.Nodes.Add(path.Split("\")(c), path.Split("\")(c))
+                                   node = node.Nodes.Add(path.Split("\")(index), path.Split("\")(index))
                                    node.ImageIndex = 0 ' folder image
                                End Sub)
 
                     Else
-                        Invoke(Sub() node = node.Nodes.Find(path.Split("\")(c), False)(0))
+                        Invoke(Sub() node = node.Nodes.Find(path.Split("\")(index), False)(0))
                     End If
                 Next
             End If
@@ -105,14 +106,15 @@
         If path.Contains("\") Then
             Dim i As Integer = path.Count(Function(c As Char) c = "\")
             For c As Integer = 0 To i - 1
-                If node.Nodes.Find(path.Split("\")(c), False).Length = 0 Then
+                Dim index As Integer = c
+                If node.Nodes.Find(path.Split("\")(index), False).Length = 0 Then
                     Me.Invoke(Sub()
-                                  node = node.Nodes.Add(path.Split("\")(c), path.Split("\")(c))
+                                  node = node.Nodes.Add(path.Split("\")(index), path.Split("\")(index))
                                   node.ImageIndex = 0 ' folder image
                               End Sub)
 
                 Else
-                    node = node.Nodes.Find(path.Split("\")(c), False)(0)
+                    node = node.Nodes.Find(path.Split("\")(index), False)(0)
                 End If
             Next
         End If
@@ -140,7 +142,7 @@
 #End Region
 #Region "Controls"
     Public Sub New()
-        Me.CheckForIllegalCrossThreadCalls = False
+        CheckForIllegalCrossThreadCalls = False
         ' This call is required by the designer.
         InitializeComponent()
 

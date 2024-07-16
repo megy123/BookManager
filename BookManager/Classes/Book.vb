@@ -210,16 +210,14 @@ Public Class Book
     End Function
     Public Function getImage() As Image
         'Select GhostScript lib
-
-        Dim rasterizer As GhostscriptRasterizer = New GhostscriptRasterizer()
-        rasterizer.Open(path)
-        Return rasterizer.GetPage(72, 1)
-
-
-
-        'rasterizer.Open(Me.path, gvi, True)
-        'Return rasterizer.GetPage(320, 0)
-        Return Nothing
+        Try
+            Dim rasterizer As GhostscriptRasterizer = New GhostscriptRasterizer()
+            rasterizer.Open(path)
+            Return rasterizer.GetPage(72, 1)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+            Return Nothing
+        End Try
     End Function
     'Private
     Private Sub loadDataFromBook(path As String)
