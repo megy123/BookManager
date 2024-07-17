@@ -1,7 +1,9 @@
 ﻿Imports System.ComponentModel
 Imports System.Reflection.Emit
+Imports System.Security.Cryptography
 Imports System.Threading
 Imports System.Xml
+Imports Ghostscript.NET.Viewer
 Public Class User
     Public Event favouriteChanged()
     Public Event lastReadUpdated()
@@ -19,8 +21,26 @@ Public Class User
     Dim l_booksCount As Integer
     Dim l_lbooks As Integer
 
+    Dim l_key As Aes
+    Dim l_encrytion As Boolean
+
+    Dim l_doc As XDocument
+
 #Region "Constructors"
-    Public Sub New()
+    Public Sub New(lib_path As String, encrytion As Boolean, pass As String)
+        Me.l_lib_path = lib_path
+        If Not System.IO.Directory.Exists(lib_path) Then ' check if valid path
+            lib_path = My.Application.Info.DirectoryPath ' set default path
+        End If
+        Me.l_encrytion = encrytion
+        Me.l_doc = Nothing
+
+        'get AES key
+        If encrytion Then
+            setPassword(pass)
+        Else
+            l_key = Nothing
+        End If
 
     End Sub
     Public Sub New(l_last_sync As Date, l_last_read As Date, l_startup_sync As Boolean, l_confirm_sync As Boolean, l_lib_path As String, l_favourite As List(Of Book), l_books As List(Of Book))
@@ -41,14 +61,12 @@ Public Class User
         End Get
         Set(value As Date?)
             l_last_sync = value
-            Dim container As XDocument = getDataContainer()
             If value Is Nothing Then
-                container.Root.Element("LastSynchronization").Value = "-"
+                Me.l_doc.Root.Element("LastSynchronization").Value = "-"
             Else
-                container.Root.Element("LastSynchronization").Value = value
+                Me.l_doc.Root.Element("LastSynchronization").Value = value
             End If
-
-            container.Save("DataContainer.xml")
+            Save()
         End Set
     End Property
     Public Property last_read As Date?
@@ -57,14 +75,13 @@ Public Class User
         End Get
         Set(value As Date?)
             l_last_read = value
-            Dim container As XDocument = getDataContainer()
             If value Is Nothing Then
-                container.Root.Element("LastRead").Value = "-"
+                Me.l_doc.Root.Element("LastRead").Value = "-"
             Else
-                container.Root.Element("LastRead").Value = value
+                Me.l_doc.Root.Element("LastRead").Value = value
             End If
 
-            container.Save("DataContainer.xml")
+            Save()
         End Set
     End Property
     Public Property startup_sync As Boolean
@@ -73,9 +90,8 @@ Public Class User
         End Get
         Set(value As Boolean)
             l_startup_sync = value
-            Dim container As XDocument = getDataContainer()
-            container.Root.Element("StartupSynchronization").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("StartupSynchronization").Value = value
+            Save()
         End Set
     End Property
     Public Property confirm_sync As Boolean
@@ -84,9 +100,8 @@ Public Class User
         End Get
         Set(value As Boolean)
             l_confirm_sync = value
-            Dim container As XDocument = getDataContainer()
-            container.Root.Element("ConfirmSynchronization").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("ConfirmSynchronization").Value = value
+            Save()
         End Set
     End Property
     Public Property lib_path As String
@@ -95,9 +110,8 @@ Public Class User
         End Get
         Set(value As String)
             l_lib_path = value
-            Dim container As XDocument = getDataContainer()
-            container.Root.Element("LibraryPath").Value = value
-            container.Save("DataContainer.xml")
+            My.Settings.lib_path = value
+            My.Settings.Save()
         End Set
     End Property
     Public Property favourite As List(Of Book)
@@ -116,17 +130,35 @@ Public Class User
             l_books = value
         End Set
     End Property
+
+    Public Property encrytion As Boolean
+        Get
+            Return l_encrytion
+        End Get
+        Set(value As Boolean)
+            l_encrytion = value
+            My.Settings.encryption = value
+            My.Settings.Save()
+        End Set
+    End Property
 #End Region
 
 #Region "Methods"
 
     'Public methods
     Public Sub Load()
-        Dim container As XDocument = getDataContainer()
-        loadUserData(container)
-        Dim tThread1 As New Thread(Sub() loadUserBooks(container))
+        Me.l_doc = getDataContainer()
+        loadUserData(Me.l_doc)
+        Dim tThread1 As New Thread(Sub() loadUserBooks(Me.l_doc))
         tThread1.Start()
         'loadUserFavouriteBooks(container) <-- toto je v BooksLoaded() funkcii
+    End Sub
+    Public Sub Save()
+        If l_encrytion Then
+            CryptoManager.EncryptXmlAES("DataContainer.xml", Me.l_key, Me.l_doc)
+        Else
+            Me.l_doc.Save("DataContainer.xml")
+        End If
     End Sub
     Public Sub sync()
         last_sync = My.Computer.Clock.LocalTime
@@ -145,18 +177,16 @@ Public Class User
     Public Sub addToFavourite(b As Book)
         favourite.Add(b)
         'save to container
-        Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.BookXMLName))
-        container.Save("DataContainer.xml")
+        Me.l_doc.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.BookXMLName))
+        Save()
 
         RaiseEvent favouriteChanged()
     End Sub
     Public Sub removeFromFavourite(b As Book)
         favourite.Remove(b)
         'save to container
-        Dim container As XDocument = getDataContainer()
-        container.Root.Element("FavouriteBooks").Element("ID" & b.BookXMLName).Remove()
-        container.Save("DataContainer.xml")
+        Me.l_doc.Root.Element("FavouriteBooks").Element("ID" & b.BookXMLName).Remove()
+        Save()
 
         RaiseEvent favouriteChanged()
     End Sub
@@ -215,6 +245,11 @@ Public Class User
     Public Function getLoadedBooks() As String
         Return l_lbooks & "/" & l_booksCount
     End Function
+    Public Sub setPassword(pass As String)
+        l_key = Aes.Create()
+        l_key.Key = CryptoManager.DerivateKey(pass, 1568, 32)
+        l_key.GenerateIV()
+    End Sub
     'Private methods
     Private Function getAllFiles(path As String) As List(Of String)
         Dim files As New List(Of String)
@@ -235,7 +270,11 @@ Public Class User
     Private Function getDataContainer() As XDocument
         'load data container, create if not exists
         If (IO.File.Exists("DataContainer.xml")) Then
-            Return XDocument.Load("DataContainer.xml")
+            If Me.encrytion Then
+                Return CryptoManager.DecryptXmlAES("DataContainer.xml", Me.l_key)
+            Else
+                Return XDocument.Load("DataContainer.xml")
+            End If
         Else
             'create new container
             Dim doc As New XDocument(
@@ -245,7 +284,6 @@ Public Class User
                     New XElement("LastRead", "-"),
                     New XElement("StartupSynchronization", True),
                     New XElement("ConfirmSynchronization", False),
-                    New XElement("LibraryPath", ""),
                     New XComment("User books."),
                     New XElement("Books"),
                     New XComment("User favourite books."),
@@ -272,10 +310,6 @@ Public Class User
 
         startup_sync = doc.Root.Element("StartupSynchronization").Value
         confirm_sync = doc.Root.Element("ConfirmSynchronization").Value
-        lib_path = doc.Root.Element("LibraryPath").Value
-        If Not System.IO.Directory.Exists(lib_path) Then ' check if valid path
-            lib_path = My.Application.Info.DirectoryPath ' set default path
-        End If
         l_booksCount = 0
         l_lbooks = 0
     End Sub
@@ -305,8 +339,7 @@ Public Class User
             RaiseEvent failedLoadAllBooks(failedLoadedBooks)
         End If
 
-        Dim container As XDocument = getDataContainer()
-        loadUserFavouriteBooks(container)
+        loadUserFavouriteBooks(Me.l_doc)
     End Sub
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)

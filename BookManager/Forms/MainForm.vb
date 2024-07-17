@@ -139,6 +139,16 @@
         End If
     End Sub
 
+    Private Function getPassword() As String
+        Dim passwordDialog As New PasswordPromtForm
+        If passwordDialog.ShowDialog() = DialogResult.OK Then
+            Return passwordDialog.TextBox1.Text
+        Else
+            Return Nothing
+        End If
+        Return Nothing
+    End Function
+
 #End Region
 #Region "Controls"
     Public Sub New()
@@ -150,9 +160,29 @@
 
     End Sub
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If Not System.IO.File.Exists("DataContainer.xml") Then
+            My.Settings.encryption = False
+            My.Settings.Save()
+        End If
+
 
         selectedBook = Nothing
-        user = New User()
+        Try
+            If (My.Settings.encryption) Then
+                Dim pass As String = Nothing
+                'While pass Is Nothing
+                pass = getPassword()
+                'End While
+
+                user = New User(My.Settings.lib_path, My.Settings.encryption, pass)
+
+                'TODO eraze pass from memory
+            Else
+                user = New User(My.Settings.lib_path, My.Settings.encryption, String.Empty)
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
 
         'Handlers
         AddHandler user.failedLoadAllBooks, AddressOf FailedBookLoad

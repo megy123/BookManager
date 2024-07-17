@@ -11,7 +11,20 @@
         Else
             Label3.Text = "Last sync. : " & Format(user.last_sync, "d. MMMM yyyy")
         End If
+        If user.encrytion Then
+            Button6.Enabled = True
+        Else
+            Button6.Enabled = False
+        End If
     End Sub
+    Private Function getPassword() As String
+        Dim passwordDialog As New PasswordPromtForm
+        If passwordDialog.ShowDialog() = DialogResult.OK Then
+            Return passwordDialog.TextBox1.Text
+        Else
+            Return Nothing
+        End If
+    End Function
 #End Region
 
 #Region "Controls"
@@ -75,6 +88,34 @@
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
         'Sync button
 
+    End Sub
+
+    Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
+        'Encryption checkbox
+        user.encrytion = CheckBox3.Checked
+        Dim pass As String = Nothing
+
+        If user.encrytion Then
+            While pass Is Nothing
+                pass = getPassword()
+            End While
+        End If
+
+        user.setPassword(pass)
+        user.Save()
+        guiInit()
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        'Password set button
+        Dim pass As String = Nothing
+        While pass Is Nothing
+            pass = getPassword()
+        End While
+
+        user.setPassword(pass)
+        user.Save()
+        guiInit()
     End Sub
 #End Region
 End Class
