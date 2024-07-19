@@ -327,6 +327,7 @@ Public Class User
             Try
                 Dim b As New Book(s, doc)
                 AddHandler b.bookRead, AddressOf lastReadUpdatedHandler
+                AddHandler b.saveData, AddressOf Save
                 books.Add(b)
                 l_lbooks += 1
                 RaiseEvent bookLoad()

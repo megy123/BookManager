@@ -2,22 +2,26 @@
 Imports System.Runtime.InteropServices
 Imports System.Security
 Imports System.Security.Cryptography
+Imports System.Text
 
 Public NotInheritable Class CryptoManager
     Public Shared Function DerivateKey(password As String, iterations As Integer, keyByteLength As Integer) As Byte()
-        'getSalt
-        Dim salt(8) As Byte
-        Using csp As New RNGCryptoServiceProvider
-            csp.GetBytes(salt)
-        End Using
-        salt = {25, 16, 25, 45, 86, 250, 85, 211}
+        ''getSalt
+        'Dim salt(8) As Byte
+        'Using csp As New RNGCryptoServiceProvider
+        '    csp.GetBytes(salt)
+        'End Using
+        'salt = {25, 16, 25, 45, 86, 250, 85, 211}
 
-        Try
-            Dim rfc = New Rfc2898DeriveBytes(password, salt, iterations)
-            Return rfc.GetBytes(keyByteLength)
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
+        'Try
+        '    Dim rfc = New Rfc2898DeriveBytes(password, salt, iterations)
+        '    Return rfc.GetBytes(keyByteLength)
+        'Catch ex As Exception
+        '    MessageBox.Show(ex.Message)
+        'End Try
+        Dim s As SHA256 = SHA256Managed.Create()
+        Return s.ComputeHash(Encoding.UTF8.GetBytes(password))
+
 
         Return Nothing
     End Function
@@ -58,6 +62,7 @@ Public NotInheritable Class CryptoManager
 
                 Dim iv() As Byte = key.IV
                 fs.Write(iv, 0, iv.Length)
+                'key.IV = Encoding.ASCII.GetBytes("asdfasdfasdfasdf")
 
                 Using cs As New CryptoStream(fs, key.CreateEncryptor(key.Key, key.IV), CryptoStreamMode.Write)
                     doc.Save(cs)
@@ -70,6 +75,7 @@ Public NotInheritable Class CryptoManager
     End Sub
 
     Public Shared Function DecryptXmlAES(filename As String, key As Aes) As XDocument
+        'key.IV = Encoding.ASCII.GetBytes("asdfasdfasdfasdf")
         Try
             Using fs As New FileStream(filename, FileMode.Open)
                 Dim buff(key.IV.Length) As Byte
@@ -85,6 +91,8 @@ Public NotInheritable Class CryptoManager
                     bytesRead += n
                     bytesToRead -= n
                 End While
+
+                key.IV = buff
 
                 Using cs As New CryptoStream(fs, key.CreateDecryptor(key.Key, key.IV), CryptoStreamMode.Read)
                     Return XDocument.Load(cs)

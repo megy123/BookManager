@@ -10,6 +10,7 @@ Imports Ghostscript.NET.Rasterizer
 Public Class Book
     Public Event readDateChanged()
     Public Event bookRead()
+    Public Event saveData()
 
     Dim l_id As Guid
     Dim l_title As String
@@ -26,7 +27,7 @@ Public Class Book
     Dim l_image As Image
 
     Public BookXMLName As String
-
+    Dim l_doc As XDocument
 
 #Region "Constructors"
     Public Sub New(l_id As Guid, l_title As String, l_autor As String, l_begin_date As Date, l_finish_date As Date, l_notes As String, l_description As String, l_page As Short, l_pages As Short, l_path As String, l_rating As SByte, l_status As SByte)
@@ -50,6 +51,7 @@ Public Class Book
         'Check if book already in data container
         Dim fileName As String = System.IO.Path.GetFileName(path)
         Me.BookXMLName = "ID" & XmlConvert.EncodeName(fileName)
+        Me.l_doc = doc
         If doc.Root.Element("Books").Element(Me.BookXMLName) IsNot Nothing Then
             loadDataFromContainer(doc.Root.Element("Books").Element(Me.BookXMLName))
         Else
@@ -93,9 +95,8 @@ Public Class Book
         End Get
         Set(value As Date?)
             l_begin_date = value
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("BeginDate").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("BeginDate").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property finish_date As Date?
@@ -104,9 +105,8 @@ Public Class Book
         End Get
         Set(value As Date?)
             l_finish_date = value
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("FinishDate").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("FinishDate").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property notes As String
@@ -115,9 +115,8 @@ Public Class Book
         End Get
         Set(value As String)
             l_notes = value
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("Notes").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("Notes").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property description As String
@@ -135,9 +134,8 @@ Public Class Book
         Set(value As Short)
             l_page = value
             RaiseEvent bookRead()
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("Page").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("Page").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property pages As Short
@@ -162,9 +160,8 @@ Public Class Book
         End Get
         Set(value As SByte)
             l_rating = value
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("Rating").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("Rating").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property status As SByte
@@ -173,9 +170,8 @@ Public Class Book
         End Get
         Set(value As SByte)
             l_status = value
-            Dim container As XDocument = XDocument.Load("DataContainer.xml")
-            container.Root.Element("Books").Element(Me.BookXMLName).Element("Status").Value = value
-            container.Save("DataContainer.xml")
+            Me.l_doc.Root.Element("Books").Element(Me.BookXMLName).Element("Status").Value = value
+            RaiseEvent saveData()
         End Set
     End Property
     Public Property image As Image
@@ -220,6 +216,9 @@ Public Class Book
         End Try
     End Function
     'Private
+    Public Sub Save()
+        RaiseEvent saveData 
+    End Sub
     Private Sub loadDataFromBook(path As String)
         'init
         Try
@@ -287,7 +286,7 @@ Public Class Book
                     New XElement("Notes", "")
                 ))
 
-            container.Save("DataContainer.xml")
+            RaiseEvent saveData()
 
             'set properties to default
             Me.l_begin_date = Nothing
