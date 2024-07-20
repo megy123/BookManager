@@ -6,21 +6,21 @@ Imports System.Text
 
 Public NotInheritable Class CryptoManager
     Public Shared Function DerivateKey(password As String, iterations As Integer, keyByteLength As Integer) As Byte()
-        ''getSalt
-        'Dim salt(8) As Byte
-        'Using csp As New RNGCryptoServiceProvider
-        '    csp.GetBytes(salt)
-        'End Using
-        'salt = {25, 16, 25, 45, 86, 250, 85, 211}
+        'getSalt
+        Dim salt(8) As Byte
+        Using csp As New RNGCryptoServiceProvider
+            csp.GetBytes(salt)
+        End Using
+        salt = {25, 16, 25, 45, 86, 250, 85, 211}
 
-        'Try
-        '    Dim rfc = New Rfc2898DeriveBytes(password, salt, iterations)
-        '    Return rfc.GetBytes(keyByteLength)
-        'Catch ex As Exception
-        '    MessageBox.Show(ex.Message)
-        'End Try
-        Dim s As SHA256 = SHA256Managed.Create()
-        Return s.ComputeHash(Encoding.UTF8.GetBytes(password))
+        Try
+            Dim rfc = New Rfc2898DeriveBytes(password, salt, iterations)
+            Return rfc.GetBytes(keyByteLength)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+        'Dim s As SHA256 = SHA256Managed.Create()
+        'Return s.ComputeHash(Encoding.UTF8.GetBytes(password))
 
 
         Return Nothing
