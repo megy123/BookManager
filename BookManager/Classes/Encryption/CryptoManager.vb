@@ -78,7 +78,7 @@ Public NotInheritable Class CryptoManager
         'key.IV = Encoding.ASCII.GetBytes("asdfasdfasdfasdf")
         Try
             Using fs As New FileStream(filename, FileMode.Open)
-                Dim buff(key.IV.Length) As Byte
+                Dim buff(key.IV.Length - 1) As Byte
                 Dim bytesToRead As Integer = key.IV.Length
                 Dim bytesRead As Integer = 0
 
@@ -93,6 +93,8 @@ Public NotInheritable Class CryptoManager
                 End While
 
                 key.IV = buff
+
+                'fs.Read(key.IV, 0, key.IV.Length)
 
                 Using cs As New CryptoStream(fs, key.CreateDecryptor(key.Key, key.IV), CryptoStreamMode.Read)
                     Return XDocument.Load(cs)
