@@ -9,6 +9,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "IDRemover", "IDRemover\IDRe
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestingApp", "TestingApp\TestingApp.vbproj", "{C73565C6-9D63-430C-BB41-F327B7688B74}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SyncServer", "SyncServer\SyncServer.pyproj", "{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{C73565C6-9D63-430C-BB41-F327B7688B74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C73565C6-9D63-430C-BB41-F327B7688B74}.Release|x64.ActiveCfg = Release|Any CPU
 		{C73565C6-9D63-430C-BB41-F327B7688B74}.Release|x64.Build.0 = Release|Any CPU
+		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
