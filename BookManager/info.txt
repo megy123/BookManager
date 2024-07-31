@@ -72,3 +72,7 @@ Problémové javy:
 - nájdenie neevidovanej knihy (bez ID)
 - nájdenie evidovanej knihy (s ID)
 - nenájdenie evidovanej knihy
+
+autentifikácia na server
+stále je jeden token, nový sa dá vygenerovať zadaním hesla
+po každej operácii sa token zmení
