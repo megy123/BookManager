@@ -11,6 +11,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestingApp", "TestingApp\Te
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SyncServer", "SyncServer\SyncServer.pyproj", "{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BookManagerInstaller", "BookManagerInstaller\BookManagerInstaller.vdproj", "{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A9C9046-3028-4FD4-B495-4AF3045E6F8A}.Release|x64.ActiveCfg = Release|Any CPU
+		{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}.Debug|Any CPU.ActiveCfg = Debug
+		{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}.Debug|x64.ActiveCfg = Debug
+		{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}.Release|Any CPU.ActiveCfg = Release
+		{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

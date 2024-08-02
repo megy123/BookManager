@@ -1,11 +1,15 @@
 ﻿Public Class Settings
     Dim user As User
+    Dim setup As Boolean
 
 #Region "Methods"
     Public Sub guiInit()
+        setup = False
+
         Label1.Text = "Library path: " & user.lib_path
         CheckBox1.Checked = user.startup_sync
         CheckBox2.Checked = user.confirm_sync
+        CheckBox3.Checked = user.encrytion
         If user.last_sync Is Nothing Then
             Label3.Text = "Last sync. :-"
         Else
@@ -16,6 +20,8 @@
         Else
             Button6.Enabled = False
         End If
+
+        setup = True
     End Sub
     Private Function getPassword() As String
         Dim passwordDialog As New PasswordPromtForm
@@ -91,19 +97,21 @@
     End Sub
 
     Private Sub CheckBox3_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox3.CheckedChanged
-        'Encryption checkbox
-        user.encrytion = CheckBox3.Checked
-        Dim pass As String = Nothing
+        If setup Then
+            'Encryption checkbox
+            user.encrytion = CheckBox3.Checked
+            Dim pass As String = Nothing
 
-        If user.encrytion Then
-            While pass Is Nothing
-                pass = getPassword()
-            End While
+            If user.encrytion Then
+                While pass Is Nothing
+                    pass = getPassword()
+                End While
+            End If
+
+            user.setPassword(pass)
+            user.Save()
+            guiInit()
         End If
-
-        user.setPassword(pass)
-        user.Save()
-        guiInit()
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click

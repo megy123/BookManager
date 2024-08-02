@@ -160,15 +160,20 @@
 
     End Sub
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If Not System.IO.File.Exists("DataContainer.xml") Then
-            My.Settings.encryption = False
-            My.Settings.Save()
-        End If
+        Try
+            If Not System.IO.File.Exists("DataContainer.xml") Then
+                My.Settings.encryption = False
+                My.Settings.Save()
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+
 
 
         selectedBook = Nothing
         Try
-            If (My.Settings.encryption) Then
+            If My.Settings.encryption Then
                 Dim pass As String = Nothing
                 'While pass Is Nothing
                 pass = getPassword()
@@ -176,7 +181,6 @@
 
                 user = New User(My.Settings.lib_path, My.Settings.encryption, pass)
 
-                'TODO eraze pass from memory
             Else
                 user = New User(My.Settings.lib_path, My.Settings.encryption, String.Empty)
             End If
@@ -189,7 +193,13 @@
         AddHandler user.bookLoad, AddressOf bookLoaded
         AddHandler user.favouriteChanged, AddressOf favouriteChanged
         AddHandler user.lastReadUpdated, AddressOf lastReadUpdated
-        user.Load()
+        Try
+            user.Load()
+        Catch ex As Exception
+            MessageBox.Show("Could not open Data file: " & ex.Message)
+            Application.Exit()
+        End Try
+
         'Search box setup
         searchBox = New ListBox()
         Me.Controls.Add(searchBox)

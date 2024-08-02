@@ -28,10 +28,10 @@ Public Class User
 
 #Region "Constructors"
     Public Sub New(lib_path As String, encrytion As Boolean, pass As String)
-        Me.l_lib_path = lib_path
         If Not System.IO.Directory.Exists(lib_path) Then ' check if valid path
             lib_path = My.Application.Info.DirectoryPath ' set default path
         End If
+        Me.l_lib_path = lib_path
         Me.l_encrytion = encrytion
         Me.l_doc = Nothing
 
@@ -148,6 +148,8 @@ Public Class User
     'Public methods
     Public Sub Load()
         Me.l_doc = getDataContainer()
+
+
         loadUserData(Me.l_doc)
         Dim tThread1 As New Thread(Sub() loadUserBooks(Me.l_doc))
         tThread1.Start()
@@ -177,7 +179,7 @@ Public Class User
     Public Sub addToFavourite(b As Book)
         favourite.Add(b)
         'save to container
-        Me.l_doc.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.BookXMLName))
+        Me.l_doc.Root.Element("FavouriteBooks").Add(New XElement("ID" & b.id.ToString()))
         Save()
 
         RaiseEvent favouriteChanged()
@@ -185,7 +187,7 @@ Public Class User
     Public Sub removeFromFavourite(b As Book)
         favourite.Remove(b)
         'save to container
-        Me.l_doc.Root.Element("FavouriteBooks").Element("ID" & b.BookXMLName).Remove()
+        Me.l_doc.Root.Element("FavouriteBooks").Element("ID" & b.id.ToString()).Remove()
         Save()
 
         RaiseEvent favouriteChanged()
@@ -229,10 +231,10 @@ Public Class User
         Next
         Return Nothing
     End Function
-    Public Function getBookById(id As Integer) As Book
+    Public Function getBookById(id As Guid) As Book
         'wiederholen
         For Each b As Book In books
-            If b.id.ToString() = id Then Return b
+            If b.id = id Then Return b
         Next
         Return Nothing
     End Function
@@ -345,7 +347,7 @@ Public Class User
     Private Sub loadUserFavouriteBooks(doc As XDocument)
         favourite = New List(Of Book)
         For Each fb As XElement In doc.Root.Element("FavouriteBooks").Elements
-            Dim book As Book = getBookById(Integer.Parse(fb.Name.LocalName.Substring(2)))
+            Dim book As Book = getBookById(Guid.Parse(fb.Name.LocalName.Substring(2)))
             If Not IsNothing(book) Then
                 favourite.Add(book)
             End If

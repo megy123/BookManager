@@ -274,12 +274,12 @@ Partial Class MainForm
         Me.Controls.Add(Me.TextBox1)
         Me.Controls.Add(Me.TreeView1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.MaximumSize = New System.Drawing.Size(1122, 570)
         Me.MinimumSize = New System.Drawing.Size(1122, 570)
         Me.Name = "MainForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "BookManager (v. Alfa)"
+        Me.Text = "BookManager (v. 1.0)"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)

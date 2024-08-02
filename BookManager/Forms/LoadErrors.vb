@@ -5,8 +5,9 @@
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+        RichTextBox1.Clear()
         For Each err As String In errors
-            ListBox1.Items.Add(err)
+            RichTextBox1.Text &= err & vbNewLine
         Next
     End Sub
 
