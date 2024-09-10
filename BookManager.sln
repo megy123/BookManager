@@ -13,6 +13,12 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SyncServer", "SyncServer\Sy
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "BookManagerInstaller", "BookManagerInstaller\BookManagerInstaller.vdproj", "{1CA7841A-E417-4B5B-B1F2-4AA69C4D9396}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E81A57C5-CED7-44AC-827F-2CCB6D23A975}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		sample1.png = sample1.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
